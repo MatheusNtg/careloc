@@ -56,6 +56,8 @@ public class userConfigActivity extends AppCompatActivity {
                     !Utils.isTextFieldEmpty(mQtdRoomsEditText)
                 ){ // In this case all fields are filled
                     //TODO Create the house object
+                    newHouse = new House();
+                    
 
                     //Start a new Activity
                     Log.d(TAG, "onClick: ~ Iniciando tela de configuração dos quartos");
