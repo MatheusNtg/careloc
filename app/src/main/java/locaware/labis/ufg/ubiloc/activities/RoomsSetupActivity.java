@@ -11,7 +11,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import locaware.labis.ufg.ubiloc.R;
+import locaware.labis.ufg.ubiloc.classes.House;
+import locaware.labis.ufg.ubiloc.classes.Room;
 import locaware.labis.ufg.ubiloc.classes.Utils;
+import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
 
 public class RoomsSetupActivity extends AppCompatActivity {
 
@@ -21,6 +24,7 @@ public class RoomsSetupActivity extends AppCompatActivity {
     //Activity elements
     EditText mRoomWidthEditText;
     EditText mRoomHeightEditText;
+    EditText mRoomNameEditText;
     Button mConfirmButton;
 
     @Override
@@ -34,6 +38,7 @@ public class RoomsSetupActivity extends AppCompatActivity {
         //Setting up the activity elements
         mRoomHeightEditText = findViewById(R.id.roomHeightEditText);
         mRoomWidthEditText  = findViewById(R.id.roomWidthEditText);
+        mRoomNameEditText   = findViewById(R.id.roomNameEditText);
         mConfirmButton      = findViewById(R.id.confirmButtonRoom);
 
         //Listener
@@ -43,8 +48,27 @@ public class RoomsSetupActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 //Check if all fields are filled
-                if(!Utils.isTextFieldEmpty(mRoomHeightEditText) && !Utils.isTextFieldEmpty(mRoomWidthEditText)){
-                    //TODO set the room dimensions on the created house
+                if(!Utils.isTextFieldEmpty(mRoomHeightEditText) &&
+                   !Utils.isTextFieldEmpty(mRoomWidthEditText) &&
+                   !Utils.isTextFieldEmpty(mRoomNameEditText)){
+                    //TODO set the room dimensions and name on the created house
+                    House workingHouse = Buffer.getLastHouse();
+                    Room theNewRoom;
+                    int width   = Integer.valueOf(mRoomWidthEditText.getText().toString());
+                    int height  = Integer.valueOf(mRoomHeightEditText.getText().toString());
+                    String name = mRoomNameEditText.getText().toString();
+
+                    theNewRoom = new Room(width,height,name);
+                    Log.d(TAG, "~ Quarto criado: ");
+                    Log.d(TAG, "~ WIDTH: " + theNewRoom.getWidth());
+                    Log.d(TAG, "~ HEIGHT: " + theNewRoom.getHeight());
+                    Log.d(TAG, "~ NAME: " + theNewRoom.getName());
+                    //Adding the new room to the house
+                    workingHouse.addRoomAtLastIndex(theNewRoom);
+                    Log.d(TAG, "~ Atual situação da casa:");
+                    Log.d(TAG, "~ NOME: " + Buffer.getLastHouse().getName());
+                    Log.d(TAG, "~ ÚLTIMO QUARTO: " + Buffer.getLastHouse().getLastRoom().getName());
+
 
                     Log.d(TAG, "onClick: ~ Iniciando atividade de coleta de amostras");
                     Intent intent = new Intent(context,collectActivity.class);

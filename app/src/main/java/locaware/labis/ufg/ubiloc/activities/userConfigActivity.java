@@ -14,6 +14,7 @@ import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.House;
 import locaware.labis.ufg.ubiloc.classes.User;
 import locaware.labis.ufg.ubiloc.classes.Utils;
+import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
 
 public class userConfigActivity extends AppCompatActivity {
 
@@ -57,7 +58,6 @@ public class userConfigActivity extends AppCompatActivity {
                     !Utils.isTextFieldEmpty(mNewUserEditText) &&
                     !Utils.isTextFieldEmpty(mQtdRoomsEditText)
                 ){ // In this case all fields are filled
-                    //TODO Create the house object
                     house = new House();
                     user  = new User();
 
@@ -72,6 +72,10 @@ public class userConfigActivity extends AppCompatActivity {
                     Log.d(TAG, "~ NOME DA CASA: " + house.getName());
                     Log.d(TAG, "~ NOME DO USUÁRIO: " + house.getUsers().get(0).getName());
                     Log.d(TAG, "~ QTD QUARTOS: " + house.getQtdRooms());
+
+                    Buffer.addHouse(house);
+
+                    Log.d(TAG, "Nova casa adicionada ao buffer");
 
                     //Start a new Activity
                     Log.d(TAG, "onClick: ~ Iniciando tela de configuração dos quartos");

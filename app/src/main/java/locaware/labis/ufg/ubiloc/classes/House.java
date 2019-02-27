@@ -48,4 +48,18 @@ public class House {
     public void setName(String name) {
         this.name = name;
     }
+
+    public void addRoomAtLastIndex(Room room){
+        this.rooms.add(this.rooms.size(),room);
+    }
+
+    public Room getLastRoom(){
+        return this.rooms.get(this.rooms.size() - 1);
+    }
+
+    public String toString(){
+        return "Nome da casa: " + name + "\n" +
+                "Quantidade de quartos" + qtdRooms + "\n";
+
+    }
 }
