@@ -1,9 +1,12 @@
 package locaware.labis.ufg.ubiloc.classes;
 
+import java.util.ArrayList;
+
 public class Room {
     private double width;
     private double height;
     private String name;
+    private ArrayList<Beacon> beacons;
 
     public Room(double width, double height, String name) {
         this.width = width;
