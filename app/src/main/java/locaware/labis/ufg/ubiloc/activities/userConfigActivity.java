@@ -12,12 +12,14 @@ import android.widget.Toast;
 
 import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.House;
+import locaware.labis.ufg.ubiloc.classes.User;
 import locaware.labis.ufg.ubiloc.classes.Utils;
 
 public class userConfigActivity extends AppCompatActivity {
 
     //Variables
-    House newHouse;
+    House house;
+    User user;
 
     //Constants
     private final String TAG = "Debug";
@@ -56,8 +58,16 @@ public class userConfigActivity extends AppCompatActivity {
                     !Utils.isTextFieldEmpty(mQtdRoomsEditText)
                 ){ // In this case all fields are filled
                     //TODO Create the house object
-                    newHouse = new House();
-                    
+                    house = new House();
+                    user  = new User();
+
+                    user.setName(mNewUserEditText.getText().toString());
+
+                    //Setting up the house
+                    house.setQtdRooms(Integer.valueOf(mQtdRoomsEditText.getText().toString()));
+                    house.setName(mNewHouseEditText.getText().toString());
+                    house.setUserAtPosition(0,user);
+
 
                     //Start a new Activity
                     Log.d(TAG, "onClick: ~ Iniciando tela de configuração dos quartos");
