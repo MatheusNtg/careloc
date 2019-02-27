@@ -11,9 +11,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import locaware.labis.ufg.ubiloc.R;
+import locaware.labis.ufg.ubiloc.classes.House;
 import locaware.labis.ufg.ubiloc.classes.Utils;
 
 public class userConfigActivity extends AppCompatActivity {
+
+    //Variables
+    House newHouse;
 
     //Constants
     private final String TAG = "Debug";
@@ -52,6 +56,8 @@ public class userConfigActivity extends AppCompatActivity {
                     !Utils.isTextFieldEmpty(mQtdRoomsEditText)
                 ){ // In this case all fields are filled
                     //TODO Create the house object
+
+                    //Start a new Activity
                     Log.d(TAG, "onClick: ~ Iniciando tela de configuração dos quartos");
                     Intent intent = new Intent(context,RoomsSetupActivity.class);
                     startActivity(intent);
