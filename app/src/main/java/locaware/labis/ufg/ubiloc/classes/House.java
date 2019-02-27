@@ -30,7 +30,7 @@ public class House {
     }
 
     public void setUserAtPosition(int position, User user){
-        this.users.set(position,user);
+        this.users.add(position,user);
     }
 
     public int getQtdRooms() {
