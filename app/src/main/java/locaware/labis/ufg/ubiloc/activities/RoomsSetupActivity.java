@@ -51,7 +51,7 @@ public class RoomsSetupActivity extends AppCompatActivity {
                 if(!Utils.isTextFieldEmpty(mRoomHeightEditText) &&
                    !Utils.isTextFieldEmpty(mRoomWidthEditText) &&
                    !Utils.isTextFieldEmpty(mRoomNameEditText)){
-                    //TODO set the room dimensions and name on the created house
+
                     House workingHouse = Buffer.getLastHouse();
                     Room theNewRoom;
                     int width   = Integer.valueOf(mRoomWidthEditText.getText().toString());
