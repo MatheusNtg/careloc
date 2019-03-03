@@ -21,6 +21,8 @@ import java.util.Comparator;
 
 import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.Beacon;
+import locaware.labis.ufg.ubiloc.classes.Room;
+import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
 
 public class collectActivity extends AppCompatActivity {
 
@@ -32,7 +34,7 @@ public class collectActivity extends AppCompatActivity {
     BluetoothAdapter bluetoothAdapter;
     private Handler handler = new Handler();
     ArrayList<Beacon> devices = new ArrayList<>();
-
+    Buffer buffer = new Buffer();
 
     //Consts
     private final int REQUEST_ENABLE_BT = 1;
@@ -113,9 +115,10 @@ public class collectActivity extends AppCompatActivity {
                     bluetoothAdapter.stopLeScan(leScanCallBack);
 
                     //Gera objeto Beacon de referência a 1m
-                    Beacon referencia = referenceBeacon(devices);
+                    Beacon referencia = getReferenceBeacon(devices);
 
-                    Log.d(TAG, "run: ~ Beacon de referência: " + referencia.getAddress() + " Média do RSSI: " + referencia.getRssi());
+                    //Coloca este beacon de referência no quarto em questão
+                    setReferenceBeacon(referencia,Buffer.getLastHouse().getLastRoom());
                 }
             },SCAN_PERIOD);
 
@@ -142,7 +145,7 @@ public class collectActivity extends AppCompatActivity {
     };
 
 
-    private Beacon referenceBeacon(ArrayList<Beacon> btDevices){
+    private Beacon getReferenceBeacon(ArrayList<Beacon> btDevices){
         Beacon reference = new Beacon();
         int rssiAverage = 0;
         int count = 0;
@@ -174,6 +177,10 @@ public class collectActivity extends AppCompatActivity {
         reference.setRssi(rssiAverage);
 
         return reference;
+    }
+
+    public void setReferenceBeacon(Beacon reference, Room room){
+        room.addReferenceBeacon(reference);
     }
 
 
