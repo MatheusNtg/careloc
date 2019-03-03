@@ -8,23 +8,38 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+
 import locaware.labis.ufg.ubiloc.R;
+import locaware.labis.ufg.ubiloc.classes.Beacon;
 
 public class collectActivity extends AppCompatActivity {
 
 
+    //Activities elements
+    Button mDetectButton;
+
     //Variables
     BluetoothAdapter bluetoothAdapter;
+    private Handler handler = new Handler();
+    ArrayList<Beacon> devices = new ArrayList<>();
+
 
     //Consts
     private final int REQUEST_ENABLE_BT = 1;
     private final String TAG = "Debug";
     private final Context context = this;
+    // Stops scanning after 10 seconds.
+    private static final long SCAN_PERIOD = 5000;
 
 
     @Override
@@ -32,9 +47,12 @@ public class collectActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_collect);
 
+        //Setting up the activity elemets
+        mDetectButton = findViewById(R.id.detectButton);
+
 
         checkBLEOnDevice();
-        Log.d(TAG, "~ Dispositivo aceita BLE");
+        Log.d(TAG, "~ O dispositivo aceita BLE");
 
         startBluetoothAdapter();
         Log.d(TAG, "~ Adaptador Bluetooth iniciado");
@@ -45,8 +63,15 @@ public class collectActivity extends AppCompatActivity {
         Log.d(TAG, "~ Checking BT permissions");
         checkBTPermissions();
 
-        Log.d(TAG, "~ Iniciando descoberta de dispositivos");
-        scanLEDevices(bluetoothAdapter);
+        mDetectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "~ Iniciando descoberta de dispositivos");
+                scanLEDevices(bluetoothAdapter);
+            }
+        });
+
+
 
 
 
@@ -77,8 +102,23 @@ public class collectActivity extends AppCompatActivity {
     }
 
 
-    private void scanLEDevices(BluetoothAdapter bluetoothAdapter){
+    private void scanLEDevices(final BluetoothAdapter bluetoothAdapter){
         if(bluetoothAdapter.isEnabled()){
+
+            //Para a descoberta de dispostivos após o tempo determinado no SCAN_PERIOD
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, "~ Parando descoberta de dispositivos");
+                    bluetoothAdapter.stopLeScan(leScanCallBack);
+
+                    //Gera objeto Beacon de referência a 1m
+                    Beacon referencia = referenceBeacon(devices);
+
+                    Log.d(TAG, "run: ~ Beacon de referência: " + referencia.getAddress() + " Média do RSSI: " + referencia.getRssi());
+                }
+            },SCAN_PERIOD);
+
             Log.d(TAG, "~ scanLEDevices: Descoberta iniciada");
             bluetoothAdapter.startLeScan(leScanCallBack);
         }else{
@@ -92,13 +132,49 @@ public class collectActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(TAG, "Dispositivo encontrado: " + device.getName() + "RSSI: " + rssi);
+                    //Adiciona os dispositivos encontrados no array list dos devices
+                    devices.add(new Beacon(rssi,device.getAddress()));
                 }
             });
 
 
         }
     };
+
+
+    private Beacon referenceBeacon(ArrayList<Beacon> btDevices){
+        Beacon reference = new Beacon();
+        int rssiAverage = 0;
+        int count = 0;
+
+        //Ordena o array dos dispositivos descobertos do maior RSSI para o menor
+        devices.sort(new Comparator<Beacon>() {
+            @Override
+            public int compare(Beacon o1, Beacon o2) {
+                return o2.getRssi() - o1.getRssi();
+            }
+        });
+
+        //Obtem o MAC do dispositivo com o maior RSSI
+        String currentAddress = devices.get(0).getAddress();
+
+        //Faz a média dos valores do beacon com maior RSSI
+        for (Beacon b: devices) {
+            if(b.getAddress().equals(currentAddress)){
+                rssiAverage += b.getRssi();
+                count++;
+            }else{
+                break;
+            }
+        }
+
+        rssiAverage = rssiAverage/count;
+
+        reference.setAddress(currentAddress);
+        reference.setRssi(rssiAverage);
+
+        return reference;
+    }
 
 
     /**
