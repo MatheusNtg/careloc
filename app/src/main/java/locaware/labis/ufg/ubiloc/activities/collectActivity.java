@@ -41,7 +41,7 @@ public class collectActivity extends AppCompatActivity {
     private final String TAG = "Debug";
     private final Context context = this;
     // Stops scanning after 10 seconds.
-    private static final long SCAN_PERIOD = 5000;
+    private static final long SCAN_PERIOD = 10000;
 
 
     @Override
@@ -119,6 +119,8 @@ public class collectActivity extends AppCompatActivity {
 
                     //Coloca este beacon de referência no quarto em questão
                     setReferenceBeacon(referencia,Buffer.getLastHouse().getLastRoom());
+
+                    Log.d(TAG, "~ MAC: " + referencia.getAddress() + " Média de potência: " + referencia.getRssi());
                 }
             },SCAN_PERIOD);
 
@@ -147,6 +149,7 @@ public class collectActivity extends AppCompatActivity {
 
     private Beacon getReferenceBeacon(ArrayList<Beacon> btDevices){
         Beacon reference = new Beacon();
+
         int rssiAverage = 0;
         int count = 0;
 
@@ -171,10 +174,16 @@ public class collectActivity extends AppCompatActivity {
             }
         }
 
+        for (Beacon b: btDevices) {
+            Log.d(TAG, "getReferenceBeacon: ~ Beacon: " + b.getAddress() + " Valor RSSI: " + b.getRssi());
+        }
+
         rssiAverage = rssiAverage/count;
 
         reference.setAddress(currentAddress);
         reference.setRssi(rssiAverage);
+
+        btDevices.clear();
 
         return reference;
     }
