@@ -35,6 +35,7 @@ public class collectActivity extends AppCompatActivity {
     private Handler handler = new Handler();
     ArrayList<Beacon> devices = new ArrayList<>();
     Buffer buffer = new Buffer();
+    int beaconsQtdDetected = 0;
 
     //Consts
     private final int REQUEST_ENABLE_BT = 1;
@@ -120,7 +121,18 @@ public class collectActivity extends AppCompatActivity {
                     //Coloca este beacon de referência no quarto em questão
                     setReferenceBeacon(referencia,Buffer.getLastHouse().getLastRoom());
 
-                    Log.d(TAG, "~ MAC: " + referencia.getAddress() + " Média de potência: " + referencia.getRssi());
+                    String message = "~ MAC: " + referencia.getAddress() + " Média de potência: " + referencia.getRssi();
+
+                    Toast.makeText(context,message,Toast.LENGTH_LONG).show();
+
+                    //Verifica se os 3 beacons de um quarto já foram detectados
+                    if(beaconsQtdDetected == 2){
+                        //Inicia a próxima activity
+                        Intent intent = new Intent(context,trackingActivity.class);
+                        startActivity(intent);
+                    }else{
+                        beaconsQtdDetected++;
+                    }
                 }
             },SCAN_PERIOD);
 
@@ -172,10 +184,6 @@ public class collectActivity extends AppCompatActivity {
             }else{
                 break;
             }
-        }
-
-        for (Beacon b: btDevices) {
-            Log.d(TAG, "getReferenceBeacon: ~ Beacon: " + b.getAddress() + " Valor RSSI: " + b.getRssi());
         }
 
         rssiAverage = rssiAverage/count;
