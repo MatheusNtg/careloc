@@ -6,7 +6,7 @@ public class Room {
     private double width;
     private double height;
     private String name;
-    private ArrayList<Beacon> referencesBeacons;
+    private ArrayList<Beacon> referencesBeacons = new ArrayList<>();
 
     public Room(double width, double height, String name) {
         this.width = width;
