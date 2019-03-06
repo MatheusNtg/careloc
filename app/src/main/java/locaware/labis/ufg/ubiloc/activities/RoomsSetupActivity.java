@@ -71,7 +71,7 @@ public class RoomsSetupActivity extends AppCompatActivity {
 //                    Log.d(TAG, "~ ÚLTIMO QUARTO: " + Buffer.getLastHouse().getLastRoom().getName());
 
                     Log.d(TAG, "~ Adiconando casa ao banco de dados");
-                    FbDatabase.writeTest(Buffer.getLastHouse());
+                    FbDatabase.writeHouse(Buffer.getLastHouse());
 
                     Log.d(TAG, "onClick: ~ Iniciando atividade de coleta de amostras");
                     Intent intent = new Intent(context,collectActivity.class);
