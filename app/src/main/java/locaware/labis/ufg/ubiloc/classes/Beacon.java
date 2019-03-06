@@ -2,12 +2,14 @@ package locaware.labis.ufg.ubiloc.classes;
 
 public class Beacon {
     private int rssi;
-    private String name;
+    private String address;
 
-    public Beacon(int rssi, String name) {
+    public Beacon(int rssi, String address) {
         this.rssi = rssi;
-        this.name = name;
+        this.address = address;
     }
+
+    public Beacon(){};
 
     public int getRssi() {
         return rssi;
@@ -17,11 +19,11 @@ public class Beacon {
         this.rssi = rssi;
     }
 
-    public String getName() {
-        return name;
+    public String getAddress() {
+        return address;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

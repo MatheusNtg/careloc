@@ -6,7 +6,7 @@ public class Room {
     private double width;
     private double height;
     private String name;
-    private ArrayList<Beacon> beacons;
+    private ArrayList<Beacon> referencesBeacons = new ArrayList<>();
 
     public Room(double width, double height, String name) {
         this.width = width;
@@ -36,5 +36,17 @@ public class Room {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public ArrayList<Beacon> getReferencesBeacons() {
+        return referencesBeacons;
+    }
+
+    public void setReferencesBeacons(ArrayList<Beacon> referencesBeacons) {
+        this.referencesBeacons = referencesBeacons;
+    }
+
+    public void addReferenceBeacon(Beacon b){
+        referencesBeacons.add(b);
     }
 }
