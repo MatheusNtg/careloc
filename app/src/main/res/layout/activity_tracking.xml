@@ -19,7 +19,7 @@
         app:layout_constraintVertical_bias="0.119" />
 
     <Button
-        android:id="@+id/showDistance"
+        android:id="@+id/distanceButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -38,9 +38,21 @@
         android:id="@+id/distanceTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Distância: "
-        android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/showDistance"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/distanceButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="0.51" />
+
+    <TextView
+        android:id="@+id/textView13"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Distância"
+        android:textSize="19sp"
+        app:layout_constraintBottom_toTopOf="@+id/distanceTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
