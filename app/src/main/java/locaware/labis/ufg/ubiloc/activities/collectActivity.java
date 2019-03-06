@@ -33,7 +33,7 @@ public class collectActivity extends AppCompatActivity {
     Button mDetectButton;
 
     //Variables
-    BluetoothUtils btUtils;
+    private BluetoothUtils btUtils;
     private Handler handler = new Handler();
     ArrayList<Beacon> devices = new ArrayList<>();
     int beaconsQtdDetected = 0;
@@ -131,6 +131,5 @@ public class collectActivity extends AppCompatActivity {
 
         }
     };
-
 
 }

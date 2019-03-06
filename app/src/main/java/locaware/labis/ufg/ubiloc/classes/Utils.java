@@ -1,14 +1,22 @@
 package locaware.labis.ufg.ubiloc.classes;
 
+import android.bluetooth.BluetoothAdapter;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 
+import locaware.labis.ufg.ubiloc.activities.collectActivity;
+
 public class Utils {
 
     private static final String TAG = "Debug";
+    private final long SCAN_TIME = 5000;
+    Handler handler = new Handler();
+
 
     //Retorna se uma caixa de texto editável está vazia ou não
     public static Boolean isTextFieldEmpty(EditText editText){
