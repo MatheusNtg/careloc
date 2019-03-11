@@ -29,7 +29,7 @@ public class House {
         this.users = users;
     }
 
-    public void setUserAtPosition(int position, User user){
+    public void setUserAtArrayPosition(int position, User user){
         this.users.add(position,user);
     }
 

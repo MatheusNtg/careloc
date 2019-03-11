@@ -38,7 +38,7 @@ public class trackingActivity extends AppCompatActivity {
     private BluetoothUtils bluetoothUtils;
     private String beaconAddress = "Erro";
 
-    ArrayList<Beacon> referencesBeacons = Buffer.getLastHouse().getLastRoom().getReferencesBeacons();
+    ArrayList<Beacon> referencesBeacons = Buffer.getHouseBuffer().getLastRoom().getReferencesBeacons();
 
 
 
