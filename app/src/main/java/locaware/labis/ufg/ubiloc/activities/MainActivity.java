@@ -64,14 +64,16 @@ public class MainActivity extends AppCompatActivity {
         mTrackingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Check the username field
-                //TODO Check if the user tipped a existing username
-                FbDatabase.hasTheUsername(mUserNameEditText.getText().toString(),callback,context);
 //                    Intent intent = new Intent(context, trackingActivity.class);
 //                    startActivity(intent);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        FbDatabase.hasTheUsername(mUserNameEditText.getText().toString(),callback,context);
+                        Log.d(TAG, "Segunda operação");
 
-
-
+                    }
+                });
 
                 if(Utils.isTextFieldEmpty(mUserNameEditText)){
                     Toast.makeText(context,"Por favor, digite um usuário válido",Toast.LENGTH_SHORT).show();

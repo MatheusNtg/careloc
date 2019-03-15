@@ -80,10 +80,8 @@ public class FbDatabase {
         void callback(String username);
     }
 
-    private static void loadReferenceByUserName(final String username){
+    private static void loadReferenceByUserName(final String username, final HouseLoadedCallback callback){
         final DatabaseReference reference = mDatabase.child(TOP_PARENT_HOUSE);
-
-        Log.d(TAG, "loadReferenceByUserName: " + reference.toString());
 
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
 
@@ -91,9 +89,9 @@ public class FbDatabase {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot houses: dataSnapshot.getChildren()) {
                     for (DataSnapshot users: houses.child("users").getChildren()) {
-                        Log.d(TAG, "onDataChange: " + users.child("name").getValue().toString());
                         if(users.child("name").getValue().toString().equals(username)){
                             usernameByReference = houses.getRef();
+                            callback.onSuccess(usernameByReference);
                         }
                     }
                 }
@@ -107,8 +105,11 @@ public class FbDatabase {
     }
 
 
-    public static DatabaseReference getUsernameByReference(String username){
-        loadReferenceByUserName(username);
-        return usernameByReference;
+    public static void getHouseReferenceByUsername(String username, HouseLoadedCallback callback){
+        loadReferenceByUserName(username,callback);
+    }
+
+    public interface HouseLoadedCallback{
+        void onSuccess(DatabaseReference reference);
     }
 }

@@ -8,6 +8,8 @@ public class Room {
     private String name;
     private ArrayList<Beacon> referencesBeacons = new ArrayList<>();
 
+    public Room(){};
+
     public Room(double width, double height, String name) {
         this.width = width;
         this.height = height;

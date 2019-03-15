@@ -8,6 +8,7 @@ public class House {
     private int qtdRooms;
     private ArrayList<User> users;
 
+
     public House(){
         rooms = new ArrayList<>();
         users = new ArrayList<>();

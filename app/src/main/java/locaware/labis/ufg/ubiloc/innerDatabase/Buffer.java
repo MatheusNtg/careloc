@@ -33,24 +33,24 @@ public class Buffer {
 
     //TODO IMPLEMENTAR ESTE MÉTODO
 
-    public static synchronized void loadBufferFromUsername(final String username){
-        DatabaseReference reference = FbDatabase.getUsernameByReference(username);
-        if(reference != null){
-            reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    House settedHouse = dataSnapshot.getValue(House.class);
-                    Buffer.setHouseBuffer(settedHouse);
-                    settedHouse.toString();
-                }
+    public static void loadBufferFromUsername(final String username){
+        FbDatabase.getHouseReferenceByUsername(username, new FbDatabase.HouseLoadedCallback() {
+            @Override
+            public void onSuccess(DatabaseReference reference) {
+                reference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        House settedHouse = dataSnapshot.getValue(House.class);
+                        Buffer.setHouseBuffer(settedHouse);
+                        Log.d(TAG, "Primeira operação");
+                    }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                }
-            });
-        }else{
-            Log.d(TAG, "loadBufferFromUsername: Erro ao carregar a base de dados");
-        }
+                    }
+                });
+            }
+        });
     }
 }
