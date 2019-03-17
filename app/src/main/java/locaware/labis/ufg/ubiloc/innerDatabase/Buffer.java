@@ -46,7 +46,6 @@ public class Buffer {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         House settedHouse = dataSnapshot.getValue(House.class);
-                        Log.d(TAG, "onDataChange: House " + settedHouse.toString());
                         Buffer.setHouseBuffer(settedHouse);
                         bufferLoadedCallback.callback();
                     }
