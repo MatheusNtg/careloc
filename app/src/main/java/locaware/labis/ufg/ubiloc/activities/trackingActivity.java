@@ -74,6 +74,7 @@ public class trackingActivity extends AppCompatActivity {
             }
         });
 
+
     }
 
 
@@ -93,7 +94,6 @@ public class trackingActivity extends AppCompatActivity {
                 public void run() {
                     Beacon currentBeacon = new Beacon(rssi,device.getAddress());
                     calculateDistance(referencesBeacons,currentBeacon);
-
                 }
             });
 
@@ -115,8 +115,6 @@ public class trackingActivity extends AppCompatActivity {
             if (ref.getAddress().equals(current.getAddress())) {
                 double division = (double) current.getRssi() / ref.getRssi();
                 beaconAddress = current.getAddress();
-//                theDistance = 0.89976 * (Math.pow(division, 7.7095)) + 0.111;
-//                showDistance(distanceTextView, theDistance);
 
                 //Teste
                 ModelSpecificDistanceCalculator modelSpecificDistanceCalculator

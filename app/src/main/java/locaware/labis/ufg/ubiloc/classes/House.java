@@ -60,7 +60,9 @@ public class House {
 
     public String toString(){
         return "Nome da casa: " + name + "\n" +
-                "Quantidade de quartos" + qtdRooms + "\n";
+                "Quantidade de quartos: " + qtdRooms + "\n" +
+                "Quarto 0: " + rooms.get(0).getName() + "\n" +
+                "Beacons de referências: " + rooms.get(0).getReferencesBeacons();
 
     }
 }

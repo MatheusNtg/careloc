@@ -68,17 +68,11 @@ public class userConfigActivity extends AppCompatActivity {
                     house.setName(mNewHouseEditText.getText().toString());
                     house.setUserAtArrayPosition(0,user);
 
-                    Log.d(TAG, "~ Objeto criado:");
-                    Log.d(TAG, "~ NOME DA CASA: " + house.getName());
-                    Log.d(TAG, "~ NOME DO USUÁRIO: " + house.getUsers().get(0).getName());
-                    Log.d(TAG, "~ QTD QUARTOS: " + house.getQtdRooms());
-
                     Buffer.setHouseBuffer(house);
 
                     Log.d(TAG, "Nova casa adicionada ao buffer");
 
                     //Start a new Activity
-                    Log.d(TAG, "onClick: ~ Iniciando tela de configuração dos quartos");
                     Intent intent = new Intent(context,RoomsSetupActivity.class);
                     startActivity(intent);
                     Log.d(TAG, "onClick: ~ Tela de configuração dos quartos iniciada");
