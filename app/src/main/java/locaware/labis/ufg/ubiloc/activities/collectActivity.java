@@ -23,6 +23,7 @@ import locaware.labis.ufg.ubiloc.Database.FbDatabase;
 import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.Beacon;
 import locaware.labis.ufg.ubiloc.classes.BluetoothUtils;
+import locaware.labis.ufg.ubiloc.classes.House;
 import locaware.labis.ufg.ubiloc.classes.Room;
 import locaware.labis.ufg.ubiloc.classes.Utils;
 import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
@@ -36,8 +37,11 @@ public class collectActivity extends AppCompatActivity {
     //Variables
     private BluetoothUtils btUtils;
     private Handler handler = new Handler();
-    ArrayList<Beacon> devices = new ArrayList<>();
+    ArrayList<Beacon> discoveredDevices = new ArrayList<>();
+    ArrayList<Beacon> referencesBeacons = new ArrayList<>();
     int beaconsQtdDetected = 0;
+    House workingHouse = Buffer.getHouseBuffer();
+
 
     //Consts
     private final int REQUEST_ENABLE_BT = 1;
@@ -88,19 +92,20 @@ public class collectActivity extends AppCompatActivity {
                     bluetoothAdapter.stopLeScan(leScanCallBack);
 
                     //Gera objeto Beacon de referência a 1m
-                    Beacon referencia = Utils.getReferenceBeacon(devices);
+                    referencesBeacons.add(Utils.getReferenceBeacon(discoveredDevices));
 
-                    //Coloca este beacon de referência no quarto em questão
-                    Utils.setReferenceBeacon(referencia,Buffer.getHouseBuffer().getLastRoom());
-
-                    String message = "~ MAC: " + referencia.getAddress() + " Média de potência: " + referencia.getRssi();
+                    String message = "~ MAC: " + referencesBeacons.get(beaconsQtdDetected).getAddress() +
+                            " Média de potência: " + referencesBeacons.get(beaconsQtdDetected).getRssi();
 
                     Toast.makeText(context,message,Toast.LENGTH_LONG).show();
 
                     //Verifica se os 3 beacons de um quarto já foram detectados
                     if(beaconsQtdDetected == 2){
+                        //Coloca os beacons de referência na casa que está sendo cadastrada
+                        // TODO Tornar esta parte escalável
+                        workingHouse.getRooms().get(0).setReferencesBeacons(referencesBeacons);
+                        FbDatabase.writeHouse(workingHouse);
                         //Inicia a próxima activity
-                        FbDatabase.writeBeacons(Buffer.getHouseBuffer(), Buffer.getHouseBuffer().getLastRoom().getReferencesBeacons());
                         Intent intent = new Intent(context,trackingActivity.class);
                         startActivity(intent);
                     }else{
@@ -126,7 +131,7 @@ public class collectActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     //Adiciona os dispositivos encontrados no array list dos devices
-                    devices.add(new Beacon(rssi,device.getAddress()));
+                    discoveredDevices.add(new Beacon(rssi,device.getAddress()));
                 }
             });
 

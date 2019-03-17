@@ -60,18 +60,9 @@ public class RoomsSetupActivity extends AppCompatActivity {
                     String name = mRoomNameEditText.getText().toString();
 
                     theNewRoom = new Room(width,height,name);
-//                    Log.d(TAG, "~ Quarto criado: ");
-//                    Log.d(TAG, "~ WIDTH: " + theNewRoom.getWidth());
-//                    Log.d(TAG, "~ HEIGHT: " + theNewRoom.getHeight());
-//                    Log.d(TAG, "~ NAME: " + theNewRoom.getName());
-                    //Adding the new room to the house
                     workingHouse.addRoomAtLastIndex(theNewRoom);
-//                    Log.d(TAG, "~ Atual situação da casa:");
-//                    Log.d(TAG, "~ NOME: " + Buffer.getLastHouse().getName());
-//                    Log.d(TAG, "~ ÚLTIMO QUARTO: " + Buffer.getLastHouse().getLastRoom().getName());
 
-                    Log.d(TAG, "~ Adiconando casa ao banco de dados");
-                    FbDatabase.writeHouse(Buffer.getHouseBuffer());
+                    Buffer.setHouseBuffer(workingHouse);
 
                     Log.d(TAG, "onClick: ~ Iniciando atividade de coleta de amostras");
                     Intent intent = new Intent(context,collectActivity.class);

@@ -74,6 +74,8 @@ public class trackingActivity extends AppCompatActivity {
             }
         });
 
+        Log.d(TAG, "onCreate: Reference beacons" + referencesBeacons);
+
     }
 
 
