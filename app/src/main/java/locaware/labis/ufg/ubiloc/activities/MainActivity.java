@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 FbDatabase.hasTheUsername(mUserNameEditText.getText().toString(),callback,context);
-                
+
                 if(Utils.isTextFieldEmpty(mUserNameEditText)){
                     Toast.makeText(context,"Por favor, digite um usuário válido",Toast.LENGTH_SHORT).show();
                 }

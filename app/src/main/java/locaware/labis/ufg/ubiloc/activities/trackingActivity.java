@@ -48,6 +48,14 @@ public class trackingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tracking);
 
+        bluetoothUtils = new BluetoothUtils(this);
+
+        //Turn on the bt if isn't on
+
+        if(!bluetoothUtils.getBluetoothAdapter().isEnabled()){
+            bluetoothUtils.enableBT();
+        }
+
         //Setting up the activity elements
         distanceButton   = findViewById(R.id.distanceButton);
         distanceTextView = findViewById(R.id.distanceTextView);
