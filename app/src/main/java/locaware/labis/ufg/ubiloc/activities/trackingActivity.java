@@ -1,5 +1,6 @@
 package locaware.labis.ufg.ubiloc.activities;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -118,4 +119,6 @@ public class trackingActivity extends AppCompatActivity {
             }
         }
     }
+
+
 }

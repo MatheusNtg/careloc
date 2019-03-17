@@ -1,5 +1,6 @@
 package locaware.labis.ufg.ubiloc.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -64,17 +65,8 @@ public class MainActivity extends AppCompatActivity {
         mTrackingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                    Intent intent = new Intent(context, trackingActivity.class);
-//                    startActivity(intent);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        FbDatabase.hasTheUsername(mUserNameEditText.getText().toString(),callback,context);
-                        Log.d(TAG, "Segunda operação");
-
-                    }
-                });
-
+                FbDatabase.hasTheUsername(mUserNameEditText.getText().toString(),callback,context);
+                
                 if(Utils.isTextFieldEmpty(mUserNameEditText)){
                     Toast.makeText(context,"Por favor, digite um usuário válido",Toast.LENGTH_SHORT).show();
                 }
@@ -86,7 +78,13 @@ public class MainActivity extends AppCompatActivity {
     FbDatabase.HasTheUserCallback callback = new FbDatabase.HasTheUserCallback() {
         @Override
         public void callback(String username) {
-        Buffer.loadBufferFromUsername(username);
+            Buffer.loadBufferFromUsername(username,new Buffer.bufferLoadedCallback() {
+                @Override
+                public void callback() {
+                    Intent intent = new Intent(context, trackingActivity.class);
+                    startActivity(intent);
+                }
+            });
         }
     };
 

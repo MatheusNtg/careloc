@@ -1,5 +1,6 @@
 package locaware.labis.ufg.ubiloc.innerDatabase;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
@@ -31,9 +32,13 @@ public class Buffer {
         Buffer.houseBuffer = houseBuffer;
     }
 
-    //TODO IMPLEMENTAR ESTE MÉTODO
 
-    public static void loadBufferFromUsername(final String username){
+    /*
+    * Carrega o buffer a partir de um usuário e ao final do processo inicia uma activity
+    * @param username Usuário para buscar no BD
+    * @param bufferLoadedCallback função para executar após o carregamento do buffer
+    * @param activity Atividade a ser iniciada*/
+    public static void loadBufferFromUsername(final String username,final bufferLoadedCallback bufferLoadedCallback){
         FbDatabase.getHouseReferenceByUsername(username, new FbDatabase.HouseLoadedCallback() {
             @Override
             public void onSuccess(DatabaseReference reference) {
@@ -42,7 +47,7 @@ public class Buffer {
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         House settedHouse = dataSnapshot.getValue(House.class);
                         Buffer.setHouseBuffer(settedHouse);
-                        Log.d(TAG, "Primeira operação");
+                        bufferLoadedCallback.callback();
                     }
 
                     @Override
@@ -52,5 +57,9 @@ public class Buffer {
                 });
             }
         });
+    }
+
+    public interface bufferLoadedCallback{
+        void callback();
     }
 }
