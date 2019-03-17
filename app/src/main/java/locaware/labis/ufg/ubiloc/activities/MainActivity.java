@@ -1,5 +1,6 @@
 package locaware.labis.ufg.ubiloc.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -10,8 +11,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+
+import locaware.labis.ufg.ubiloc.Database.FbDatabase;
 import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.Utils;
+import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     Button mConfigButton;
     Button mTrackingButton;
     EditText mUserNameEditText;
+    public Context context;
 
     //Intents for start a new activity
     Intent userConfigIntent;
@@ -32,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Context
-        final Context context = this;
+        context = this;
 
         //Setting the Intents for start a new activity
         userConfigIntent = new Intent(this,userConfigActivity.class);
@@ -59,21 +65,27 @@ public class MainActivity extends AppCompatActivity {
         mTrackingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Check the username field
-                //TODO Check if the user tipped a existing username
-                if(!Utils.isTextFieldEmpty(mUserNameEditText)){
-                    Log.d(TAG, "onClick: ~ Iniciando tracking activity");
-                    Intent intent = new Intent(context,trackingActivity.class);
-                    startActivity(intent);
-                    Log.d(TAG, "onClick: ~ Tracking activity iniciada");
-                }else{
+                FbDatabase.hasTheUsername(mUserNameEditText.getText().toString(),callback,context);
+
+                if(Utils.isTextFieldEmpty(mUserNameEditText)){
                     Toast.makeText(context,"Por favor, digite um usuário válido",Toast.LENGTH_SHORT).show();
                 }
             }
         });
-
     }
 
 
+    FbDatabase.HasTheUserCallback callback = new FbDatabase.HasTheUserCallback() {
+        @Override
+        public void callback(String username) {
+            Buffer.loadBufferFromUsername(username,new Buffer.bufferLoadedCallback() {
+                @Override
+                public void callback() {
+                    Intent intent = new Intent(context, trackingActivity.class);
+                    startActivity(intent);
+                }
+            });
+        }
+    };
 
 }

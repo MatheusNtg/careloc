@@ -8,6 +8,7 @@ public class House {
     private int qtdRooms;
     private ArrayList<User> users;
 
+
     public House(){
         rooms = new ArrayList<>();
         users = new ArrayList<>();
@@ -29,7 +30,7 @@ public class House {
         this.users = users;
     }
 
-    public void setUserAtPosition(int position, User user){
+    public void setUserAtArrayPosition(int position, User user){
         this.users.add(position,user);
     }
 

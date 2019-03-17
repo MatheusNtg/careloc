@@ -1,5 +1,6 @@
 package locaware.labis.ufg.ubiloc.activities;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -38,7 +39,7 @@ public class trackingActivity extends AppCompatActivity {
     private BluetoothUtils bluetoothUtils;
     private String beaconAddress = "Erro";
 
-    ArrayList<Beacon> referencesBeacons = Buffer.getLastHouse().getLastRoom().getReferencesBeacons();
+    ArrayList<Beacon> referencesBeacons = Buffer.getHouseBuffer().getLastRoom().getReferencesBeacons();
 
 
 
@@ -46,6 +47,14 @@ public class trackingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tracking);
+
+        bluetoothUtils = new BluetoothUtils(this);
+
+        //Turn on the bt if isn't on
+
+        if(!bluetoothUtils.getBluetoothAdapter().isEnabled()){
+            bluetoothUtils.enableBT();
+        }
 
         //Setting up the activity elements
         distanceButton   = findViewById(R.id.distanceButton);
@@ -118,4 +127,6 @@ public class trackingActivity extends AppCompatActivity {
             }
         }
     }
+
+
 }

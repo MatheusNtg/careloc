@@ -66,14 +66,14 @@ public class userConfigActivity extends AppCompatActivity {
                     //Setting up the house
                     house.setQtdRooms(Integer.valueOf(mQtdRoomsEditText.getText().toString()));
                     house.setName(mNewHouseEditText.getText().toString());
-                    house.setUserAtPosition(0,user);
+                    house.setUserAtArrayPosition(0,user);
 
                     Log.d(TAG, "~ Objeto criado:");
                     Log.d(TAG, "~ NOME DA CASA: " + house.getName());
                     Log.d(TAG, "~ NOME DO USUÁRIO: " + house.getUsers().get(0).getName());
                     Log.d(TAG, "~ QTD QUARTOS: " + house.getQtdRooms());
 
-                    Buffer.addHouse(house);
+                    Buffer.setHouseBuffer(house);
 
                     Log.d(TAG, "Nova casa adicionada ao buffer");
 

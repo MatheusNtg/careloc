@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import locaware.labis.ufg.ubiloc.Database.FbDatabase;
 import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.House;
 import locaware.labis.ufg.ubiloc.classes.Room;
@@ -52,23 +53,25 @@ public class RoomsSetupActivity extends AppCompatActivity {
                    !Utils.isTextFieldEmpty(mRoomWidthEditText) &&
                    !Utils.isTextFieldEmpty(mRoomNameEditText)){
 
-                    House workingHouse = Buffer.getLastHouse();
+                    House workingHouse = Buffer.getHouseBuffer();
                     Room theNewRoom;
-                    int width   = Integer.valueOf(mRoomWidthEditText.getText().toString());
-                    int height  = Integer.valueOf(mRoomHeightEditText.getText().toString());
+                    double width   = Double.valueOf(mRoomWidthEditText.getText().toString());
+                    double height  = Double.valueOf(mRoomHeightEditText.getText().toString());
                     String name = mRoomNameEditText.getText().toString();
 
                     theNewRoom = new Room(width,height,name);
-                    Log.d(TAG, "~ Quarto criado: ");
-                    Log.d(TAG, "~ WIDTH: " + theNewRoom.getWidth());
-                    Log.d(TAG, "~ HEIGHT: " + theNewRoom.getHeight());
-                    Log.d(TAG, "~ NAME: " + theNewRoom.getName());
+//                    Log.d(TAG, "~ Quarto criado: ");
+//                    Log.d(TAG, "~ WIDTH: " + theNewRoom.getWidth());
+//                    Log.d(TAG, "~ HEIGHT: " + theNewRoom.getHeight());
+//                    Log.d(TAG, "~ NAME: " + theNewRoom.getName());
                     //Adding the new room to the house
                     workingHouse.addRoomAtLastIndex(theNewRoom);
-                    Log.d(TAG, "~ Atual situação da casa:");
-                    Log.d(TAG, "~ NOME: " + Buffer.getLastHouse().getName());
-                    Log.d(TAG, "~ ÚLTIMO QUARTO: " + Buffer.getLastHouse().getLastRoom().getName());
+//                    Log.d(TAG, "~ Atual situação da casa:");
+//                    Log.d(TAG, "~ NOME: " + Buffer.getLastHouse().getName());
+//                    Log.d(TAG, "~ ÚLTIMO QUARTO: " + Buffer.getLastHouse().getLastRoom().getName());
 
+                    Log.d(TAG, "~ Adiconando casa ao banco de dados");
+                    FbDatabase.writeHouse(Buffer.getHouseBuffer());
 
                     Log.d(TAG, "onClick: ~ Iniciando atividade de coleta de amostras");
                     Intent intent = new Intent(context,collectActivity.class);

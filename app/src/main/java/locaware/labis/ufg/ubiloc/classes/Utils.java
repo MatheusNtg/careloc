@@ -6,6 +6,8 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -67,4 +69,6 @@ public class Utils {
     public static void setReferenceBeacon(Beacon reference, Room room){
         room.addReferenceBeacon(reference);
     }
+
+
 }

@@ -19,6 +19,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+import locaware.labis.ufg.ubiloc.Database.FbDatabase;
 import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.Beacon;
 import locaware.labis.ufg.ubiloc.classes.BluetoothUtils;
@@ -90,7 +91,7 @@ public class collectActivity extends AppCompatActivity {
                     Beacon referencia = Utils.getReferenceBeacon(devices);
 
                     //Coloca este beacon de referência no quarto em questão
-                    Utils.setReferenceBeacon(referencia,Buffer.getLastHouse().getLastRoom());
+                    Utils.setReferenceBeacon(referencia,Buffer.getHouseBuffer().getLastRoom());
 
                     String message = "~ MAC: " + referencia.getAddress() + " Média de potência: " + referencia.getRssi();
 
@@ -99,6 +100,7 @@ public class collectActivity extends AppCompatActivity {
                     //Verifica se os 3 beacons de um quarto já foram detectados
                     if(beaconsQtdDetected == 2){
                         //Inicia a próxima activity
+                        FbDatabase.writeBeacons(Buffer.getHouseBuffer(), Buffer.getHouseBuffer().getLastRoom().getReferencesBeacons());
                         Intent intent = new Intent(context,trackingActivity.class);
                         startActivity(intent);
                     }else{
