@@ -17,11 +17,15 @@ import org.altbeacon.beacon.distance.CurveFittedDistanceCalculator;
 import org.altbeacon.beacon.distance.ModelSpecificDistanceCalculator;
 import org.w3c.dom.Text;
 
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.Beacon;
 import locaware.labis.ufg.ubiloc.classes.BluetoothUtils;
+import locaware.labis.ufg.ubiloc.classes.Distance;
 import locaware.labis.ufg.ubiloc.classes.Utils;
 import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
 
@@ -30,6 +34,7 @@ public class trackingActivity extends AppCompatActivity {
     //Consts
     private Context context;
     private final String TAG = "Debug";
+    private final long PERIOD = 1500;
 
     //Activity elements
     private TextView distanceTextView;
@@ -38,6 +43,7 @@ public class trackingActivity extends AppCompatActivity {
     //Vars
     private BluetoothUtils bluetoothUtils;
     private String beaconAddress = "Erro";
+    private ArrayList<Distance> distancePacks = new ArrayList<>();
 
     ArrayList<Beacon> referencesBeacons = Buffer.getHouseBuffer().getLastRoom().getReferencesBeacons();
 
@@ -74,6 +80,13 @@ public class trackingActivity extends AppCompatActivity {
             }
         });
 
+        //Just for debug TODO Erase this later
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Log.d(TAG, "Debug---->" + distancePacks);
+            }
+        },0,PERIOD);
 
     }
 
@@ -113,7 +126,6 @@ public class trackingActivity extends AppCompatActivity {
         //Percorre a lista até achar o beacon que está sendo escaneado
         for (Beacon ref: reference) {
             if (ref.getAddress().equals(current.getAddress())) {
-                double division = (double) current.getRssi() / ref.getRssi();
                 beaconAddress = current.getAddress();
 
                 //Teste
@@ -122,6 +134,12 @@ public class trackingActivity extends AppCompatActivity {
 
                 theDistance = modelSpecificDistanceCalculator.calculateDistance(ref.getRssi(),(double) current.getRssi());
                 showDistance(distanceTextView,theDistance);
+                if(distancePacks.size() < 3){
+                    Utils.addDistance(distancePacks,new Distance(theDistance,ref.getAddress()));
+                }else{
+                    //TODO Calcular trilateração
+                    distancePacks.clear();
+                }
             }
         }
     }
