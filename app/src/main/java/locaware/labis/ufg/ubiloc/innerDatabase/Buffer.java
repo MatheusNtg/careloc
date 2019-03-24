@@ -28,10 +28,15 @@ public class Buffer {
         return houseBuffer;
     }
 
+    public static String usernameFlag;
+
     public static void setHouseBuffer(House houseBuffer) {
         Buffer.houseBuffer = houseBuffer;
     }
 
+    public static void setUsernameFlag(String flag) { Buffer.usernameFlag = flag; }
+
+    public static String getCurrentUsername() { return usernameFlag; }
 
     /*
     * Carrega o buffer a partir de um usuário e ao final do processo inicia uma activity
@@ -42,7 +47,7 @@ public class Buffer {
         FbDatabase.getHouseReferenceByUsername(username, new FbDatabase.HouseLoadedCallback() {
             @Override
             public void onSuccess(DatabaseReference reference) {
-                reference.addValueEventListener(new ValueEventListener() {
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         House settedHouse = dataSnapshot.getValue(House.class);

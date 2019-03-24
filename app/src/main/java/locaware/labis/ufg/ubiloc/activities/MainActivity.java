@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
     FbDatabase.HasTheUserCallback callback = new FbDatabase.HasTheUserCallback() {
         @Override
         public void callback(String username) {
+            Buffer.setUsernameFlag(username);
             Buffer.loadBufferFromUsername(username,new Buffer.bufferLoadedCallback() {
                 @Override
                 public void callback() {

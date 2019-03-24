@@ -23,11 +23,13 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import locaware.labis.ufg.ubiloc.Database.FbDatabase;
 import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.Beacon;
 import locaware.labis.ufg.ubiloc.classes.BluetoothUtils;
 import locaware.labis.ufg.ubiloc.classes.Distance;
 import locaware.labis.ufg.ubiloc.classes.House;
+import locaware.labis.ufg.ubiloc.classes.Position;
 import locaware.labis.ufg.ubiloc.classes.Room;
 import locaware.labis.ufg.ubiloc.classes.Utils;
 import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
@@ -110,7 +112,6 @@ public class trackingActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(TAG, "run: Pelo amor de Deus  será que eu nunca vou entrar aqui não ?");
                     Beacon currentBeacon = new Beacon(rssi,device.getAddress());
                     calculateDistance(referencesBeacons,currentBeacon);
                 }
@@ -172,6 +173,8 @@ public class trackingActivity extends AppCompatActivity {
 
         // the answer
         position = optimum.getPoint().toArray();
+
+        FbDatabase.updateUserPosition(new Position(position[0], position[1]));
 
         Log.d(TAG, "calculatePosition: Position:" + position[0] + ", " + position[1] + "\n");
     }
