@@ -77,27 +77,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-
-        //TODO Apagar isto depois pois é apenas um teste
-        double[] b1 = {1.45 , 0};
-        double[] b2 = {0    , 1.75};
-        double[] b3 = {2.9  , 1.75};
-
-        double rad_b1 = 2;
-        double rad_b2 = 2.4;
-        double rad_b3 = 1.9;
-
-        double[][] positions = new double[][] { b1, b2, b3 };
-
-        double[] distances = new double[] {rad_b1,rad_b2,rad_b3};
-
-        NonLinearLeastSquaresSolver solver = new NonLinearLeastSquaresSolver(new TrilaterationFunction(positions, distances), new LevenbergMarquardtOptimizer());
-        LeastSquaresOptimizer.Optimum optimum = solver.solve();
-
-        // the answer
-        double[] centroid = optimum.getPoint().toArray();
-        Log.d(TAG, "Teste do resultado: " + "(" + centroid[0] + "," + centroid[1] + ")" );
     }
 
 
