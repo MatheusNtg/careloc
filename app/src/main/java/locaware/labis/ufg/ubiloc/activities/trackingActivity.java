@@ -1,10 +1,8 @@
 package locaware.labis.ufg.ubiloc.activities;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,15 +11,26 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.altbeacon.beacon.distance.CurveFittedDistanceCalculator;
+import com.lemmingapex.trilateration.NonLinearLeastSquaresSolver;
+import com.lemmingapex.trilateration.TrilaterationFunction;
+
 import org.altbeacon.beacon.distance.ModelSpecificDistanceCalculator;
-import org.w3c.dom.Text;
+import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
+import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer;
 
+import java.nio.BufferOverflowException;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import locaware.labis.ufg.ubiloc.Database.FbDatabase;
 import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.Beacon;
 import locaware.labis.ufg.ubiloc.classes.BluetoothUtils;
+import locaware.labis.ufg.ubiloc.classes.Distance;
+import locaware.labis.ufg.ubiloc.classes.House;
+import locaware.labis.ufg.ubiloc.classes.Position;
+import locaware.labis.ufg.ubiloc.classes.Room;
 import locaware.labis.ufg.ubiloc.classes.Utils;
 import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
 
@@ -30,14 +39,17 @@ public class trackingActivity extends AppCompatActivity {
     //Consts
     private Context context;
     private final String TAG = "Debug";
+    private final long PERIOD = 1500;
 
     //Activity elements
-    private TextView distanceTextView;
-    private Button distanceButton;
+    private TextView positionTextView;
+    private Button positionButton;
 
     //Vars
     private BluetoothUtils bluetoothUtils;
     private String beaconAddress = "Erro";
+    private ArrayList<Distance> distancePacks = new ArrayList<>();
+    private double[] position = new double[2];
 
     ArrayList<Beacon> referencesBeacons = Buffer.getHouseBuffer().getLastRoom().getReferencesBeacons();
 
@@ -53,27 +65,35 @@ public class trackingActivity extends AppCompatActivity {
         //Turn on the bt if isn't on
 
         if(!bluetoothUtils.getBluetoothAdapter().isEnabled()){
+            bluetoothUtils.checkBTPermissions();
             bluetoothUtils.enableBT();
         }
 
         //Setting up the activity elements
-        distanceButton   = findViewById(R.id.distanceButton);
-        distanceTextView = findViewById(R.id.distanceTextView);
-        context = this;
+        positionButton   = findViewById(R.id.positionButton);
+        positionTextView = findViewById(R.id.positionTextView);
+        context          = this;
 
         //Setting up the bt utils
         bluetoothUtils = new BluetoothUtils(this);
 
         scanLEDevices(bluetoothUtils.getBluetoothAdapter());
 
-        //Listener
-        distanceButton.setOnClickListener(new View.OnClickListener() {
+        //Listeners
+        positionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDistance(distanceTextView,0);
+                showPosition(positionTextView,position);
             }
         });
 
+        //Just for debug TODO Erase this later
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Log.d(TAG, "Debug---->" + distancePacks);
+            }
+        },0,PERIOD);
 
     }
 
@@ -82,7 +102,7 @@ public class trackingActivity extends AppCompatActivity {
         if(bluetoothAdapter.isEnabled()){
             bluetoothAdapter.startLeScan(leScanCallBack);
         }else{
-            Toast.makeText(context,"Bluetooth desligado, por favor, ligue o bluetooth", Toast.LENGTH_SHORT);
+//            Toast.makeText(context,"Bluetooth desligado, por favor, ligue o bluetooth", Toast.LENGTH_SHORT);
         }
     }
 
@@ -101,10 +121,11 @@ public class trackingActivity extends AppCompatActivity {
         }
     };
 
-
-    private void showDistance(TextView textView, double distance){
-        scanLEDevices(bluetoothUtils.getBluetoothAdapter());
-        textView.setText(String.format("%.2f m", distance));
+    private void showPosition(TextView text, double[] position){
+        if(position.length != 0) {
+            text.setText("x: " + String.format("%.2f", position[0]) +
+                    "y: " + String.format("%.2f",position[1]));
+        }
     }
 
 
@@ -113,7 +134,6 @@ public class trackingActivity extends AppCompatActivity {
         //Percorre a lista até achar o beacon que está sendo escaneado
         for (Beacon ref: reference) {
             if (ref.getAddress().equals(current.getAddress())) {
-                double division = (double) current.getRssi() / ref.getRssi();
                 beaconAddress = current.getAddress();
 
                 //Teste
@@ -121,9 +141,45 @@ public class trackingActivity extends AppCompatActivity {
                         = new ModelSpecificDistanceCalculator(context,"teste");
 
                 theDistance = modelSpecificDistanceCalculator.calculateDistance(ref.getRssi(),(double) current.getRssi());
-                showDistance(distanceTextView,theDistance);
+                if(distancePacks.size() < 3){
+                    Utils.addDistance(distancePacks,new Distance(theDistance,ref.getAddress()));
+                }else{
+                    calculatePosition(distancePacks);
+                    showPosition(positionTextView,position);
+                    distancePacks.clear();
+                }
             }
         }
+    }
+
+    private void calculatePosition(ArrayList<Distance> distancePacks){
+        Room sampleRoom = Buffer.getHouseBuffer().getLastRoom();
+        ArrayList<Beacon> sampleReferenceBeacons = Buffer.getHouseBuffer().getLastRoom().getReferencesBeacons();
+        //TODO fazer a posição ser adquirida a partir da posição de cada instância do beacon no quarto
+        double[] pos_b1 = {sampleReferenceBeacons.get(0).getBeacon_position().getX() ,
+                sampleReferenceBeacons.get(0).getBeacon_position().getY()};
+        double[] pos_b2 = {sampleReferenceBeacons.get(1).getBeacon_position().getX(),
+                sampleReferenceBeacons.get(1).getBeacon_position().getY()   };
+        double[] pos_b3 = {sampleReferenceBeacons.get(2).getBeacon_position().getX(),
+                sampleReferenceBeacons.get(2).getBeacon_position().getY()};
+
+        double rad_b1 = distancePacks.get(0).getTheDistance();
+        double rad_b2 = distancePacks.get(1).getTheDistance();
+        double rad_b3 = distancePacks.get(2).getTheDistance();
+
+        double[][] beacons_positions = new double[][] { pos_b1, pos_b2, pos_b3};
+
+        double[] distances = new double[] {rad_b1,rad_b2,rad_b3};
+
+        NonLinearLeastSquaresSolver solver = new NonLinearLeastSquaresSolver(new TrilaterationFunction(beacons_positions, distances), new LevenbergMarquardtOptimizer());
+        LeastSquaresOptimizer.Optimum optimum = solver.solve();
+
+        // the answer
+        position = optimum.getPoint().toArray();
+
+        FbDatabase.updateUserPosition(new Position(position[0], position[1]));
+
+        Log.d(TAG, "calculatePosition: Position:" + position[0] + ", " + position[1] + "\n");
     }
 
 

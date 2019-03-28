@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.House;
+import locaware.labis.ufg.ubiloc.classes.Position;
 import locaware.labis.ufg.ubiloc.classes.User;
 import locaware.labis.ufg.ubiloc.classes.Utils;
 import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
@@ -62,6 +63,7 @@ public class userConfigActivity extends AppCompatActivity {
                     user  = new User();
 
                     user.setName(mNewUserEditText.getText().toString());
+                    user.setPosition(new Position(0,0));
 
                     //Setting up the house
                     house.setQtdRooms(Integer.valueOf(mQtdRoomsEditText.getText().toString()));

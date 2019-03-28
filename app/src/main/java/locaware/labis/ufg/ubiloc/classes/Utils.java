@@ -11,7 +11,7 @@ import com.google.firebase.database.DatabaseReference;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-import locaware.labis.ufg.ubiloc.activities.collectActivity;
+import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
 
 public class Utils {
 
@@ -31,6 +31,7 @@ public class Utils {
 
     public static Beacon getReferenceBeacon(ArrayList<Beacon> btDevices){
         Beacon reference = new Beacon();
+        Position currentPosition = new Position();
 
         int rssiAverage = 0;
         int count = 0;
@@ -45,6 +46,7 @@ public class Utils {
 
         //Obtem o MAC do dispositivo com o maior RSSI
         String currentAddress = btDevices.get(0).getAddress();
+        currentPosition = btDevices.get(0).getBeacon_position();
 
         //Faz a média dos valores do beacon com maior RSSI
         for (Beacon b: btDevices) {
@@ -60,6 +62,7 @@ public class Utils {
 
         reference.setAddress(currentAddress);
         reference.setRssi(rssiAverage);
+        reference.setBeacon_position(currentPosition);
 
         btDevices.clear();
 
@@ -68,6 +71,33 @@ public class Utils {
 
     public static void setReferenceBeacon(Beacon reference, Room room){
         room.addReferenceBeacon(reference);
+    }
+
+
+    public static void addDistance(ArrayList<Distance> arrayList, Distance distance){
+
+        if(arrayList.isEmpty()){
+            arrayList.add(distance);
+        }else {
+            if(!arrayList.contains(distance)){
+                arrayList.add(distance);
+            }
+        }
+        
+    }
+
+    private static boolean containsTheAddress(ArrayList<Beacon> reference, ArrayList<Distance> distances){
+        for(int i = 0; i < reference.size();i++){
+            for (int j = 0; j < distances.size();j++){
+                if(distances.get(j).getReferBeacon().equals(reference.get(i).getAddress())){
+                    String debug1 = distances.get(j).getReferBeacon();
+                    String debug2 = reference.get(i).getAddress();
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
 

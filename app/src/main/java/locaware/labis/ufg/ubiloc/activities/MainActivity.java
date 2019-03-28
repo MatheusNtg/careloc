@@ -12,6 +12,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
+import com.lemmingapex.trilateration.NonLinearLeastSquaresSolver;
+import com.lemmingapex.trilateration.TrilaterationFunction;
+
+import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
+import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer;
 
 import locaware.labis.ufg.ubiloc.Database.FbDatabase;
 import locaware.labis.ufg.ubiloc.R;
@@ -78,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
     FbDatabase.HasTheUserCallback callback = new FbDatabase.HasTheUserCallback() {
         @Override
         public void callback(String username) {
+            Buffer.setUsernameFlag(username);
             Buffer.loadBufferFromUsername(username,new Buffer.bufferLoadedCallback() {
                 @Override
                 public void callback() {

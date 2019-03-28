@@ -17,7 +17,9 @@ import java.util.EventListener;
 import locaware.labis.ufg.ubiloc.activities.MainActivity;
 import locaware.labis.ufg.ubiloc.classes.Beacon;
 import locaware.labis.ufg.ubiloc.classes.House;
+import locaware.labis.ufg.ubiloc.classes.Position;
 import locaware.labis.ufg.ubiloc.classes.User;
+import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
 
 public class FbDatabase {
 
@@ -38,14 +40,6 @@ public class FbDatabase {
     public static void writeHouse(House house){
         mDatabase.child(TOP_PARENT_HOUSE)
                 .child(house.getName()).setValue(house);
-    }
-
-    public static void writeBeacons(House house, ArrayList<Beacon> referencesBeacon){
-        int indexOfLastRoom = house.getRooms().indexOf(house.getLastRoom());
-        mDatabase.child(TOP_PARENT_HOUSE)
-                .child(house.getName()).child("rooms")
-                .child(String.valueOf(indexOfLastRoom))
-                .child("Reference Beacons").setValue(referencesBeacon);
     }
 
     public static void hasTheUsername(final String username, final HasTheUserCallback hasTheUserCallback, final Context context){
@@ -111,5 +105,18 @@ public class FbDatabase {
 
     public interface HouseLoadedCallback{
         void onSuccess(DatabaseReference reference);
+    }
+
+    public static void updateUserPosition(Position position){
+        User currentUser = new User(Buffer.getCurrentUsername(),position);
+
+        //Todo Tornar isto escalável
+        mDatabase.child(TOP_PARENT_HOUSE)
+                .child(Buffer.getHouseBuffer().getName())
+                .child("users")
+                .child("0")
+                .child("position")
+                .setValue(currentUser.getPosition());
+
     }
 }
