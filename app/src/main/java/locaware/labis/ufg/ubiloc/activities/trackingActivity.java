@@ -154,11 +154,14 @@ public class trackingActivity extends AppCompatActivity {
 
     private void calculatePosition(ArrayList<Distance> distancePacks){
         Room sampleRoom = Buffer.getHouseBuffer().getLastRoom();
-        ArrayList<Beacon> sampleReferenceBeacons = sampleRoom.getReferencesBeacons();
+        ArrayList<Beacon> sampleReferenceBeacons = Buffer.getHouseBuffer().getLastRoom().getReferencesBeacons();
         //TODO fazer a posição ser adquirida a partir da posição de cada instância do beacon no quarto
-        double[] pos_b1 = {2.9 , 1.79};
-        double[] pos_b2 = {1.45, 0   };
-        double[] pos_b3 = {0   , 1.79};
+        double[] pos_b1 = {sampleReferenceBeacons.get(0).getBeacon_position().getX() ,
+                sampleReferenceBeacons.get(0).getBeacon_position().getY()};
+        double[] pos_b2 = {sampleReferenceBeacons.get(1).getBeacon_position().getX(),
+                sampleReferenceBeacons.get(1).getBeacon_position().getY()   };
+        double[] pos_b3 = {sampleReferenceBeacons.get(2).getBeacon_position().getX(),
+                sampleReferenceBeacons.get(2).getBeacon_position().getY()};
 
         double rad_b1 = distancePacks.get(0).getTheDistance();
         double rad_b2 = distancePacks.get(1).getTheDistance();

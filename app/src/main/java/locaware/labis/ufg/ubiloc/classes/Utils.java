@@ -31,6 +31,7 @@ public class Utils {
 
     public static Beacon getReferenceBeacon(ArrayList<Beacon> btDevices){
         Beacon reference = new Beacon();
+        Position currentPosition = new Position();
 
         int rssiAverage = 0;
         int count = 0;
@@ -45,6 +46,7 @@ public class Utils {
 
         //Obtem o MAC do dispositivo com o maior RSSI
         String currentAddress = btDevices.get(0).getAddress();
+        currentPosition = btDevices.get(0).getBeacon_position();
 
         //Faz a média dos valores do beacon com maior RSSI
         for (Beacon b: btDevices) {
@@ -60,6 +62,7 @@ public class Utils {
 
         reference.setAddress(currentAddress);
         reference.setRssi(rssiAverage);
+        reference.setBeacon_position(currentPosition);
 
         btDevices.clear();
 
