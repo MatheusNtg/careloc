@@ -94,6 +94,8 @@ public class collectActivity extends AppCompatActivity {
 
                     //Gera objeto Beacon de referência a 1m
                     referencesBeacons.add(Utils.getReferenceBeacon(discoveredDevices));
+                    
+                    //TODO Temos que dar um clear em discoveredDevices
 
                     String message = "~ MAC: " + referencesBeacons.get(beaconsQtdDetected).getAddress() +
                             " Média de potência: " + referencesBeacons.get(beaconsQtdDetected).getRssi() +
