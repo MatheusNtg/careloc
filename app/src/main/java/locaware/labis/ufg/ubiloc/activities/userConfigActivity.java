@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.House;
-import locaware.labis.ufg.ubiloc.classes.Position;
 import locaware.labis.ufg.ubiloc.classes.User;
 import locaware.labis.ufg.ubiloc.classes.Utils;
 import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;

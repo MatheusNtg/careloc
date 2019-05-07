@@ -12,12 +12,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.EventListener;
 
-import locaware.labis.ufg.ubiloc.activities.MainActivity;
-import locaware.labis.ufg.ubiloc.classes.Beacon;
 import locaware.labis.ufg.ubiloc.classes.House;
-import locaware.labis.ufg.ubiloc.classes.Position;
 import locaware.labis.ufg.ubiloc.classes.User;
 import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
 
@@ -118,5 +114,15 @@ public class FbDatabase {
                 .child("position")
                 .setValue(currentUser.getPosition());
 
+    }
+
+    public static void updateBeaconsDistance(ArrayList<Distance> distances){
+        //Todo Tornar isto escalável
+        mDatabase.child(TOP_PARENT_HOUSE)
+                .child(Buffer.getHouseBuffer().getName())
+                .child("users")
+                .child("0")
+                .child("distances")
+                .setValue(distances);
     }
 }

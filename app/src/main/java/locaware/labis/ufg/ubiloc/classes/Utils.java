@@ -15,7 +15,7 @@ import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
 
 public class Utils {
 
-    private static final String TAG = "Debug";
+    private static final String TAG = "Teste";
     private final long SCAN_TIME = 5000;
     Handler handler = new Handler();
 
@@ -101,4 +101,42 @@ public class Utils {
     }
 
 
+    public static void organizeDistancePacks(ArrayList<Distance> distancePacks, ArrayList<Beacon> sampleReferenceBeacons) {
+        Log.d(TAG, "-----Antes de organizar--------\n" + distancePacks + '\n');
+//        Log.d(TAG, "-----SAMPLE REFERENCE BEACONS-----------------\n" +
+//                sampleReferenceBeacons.get(0)  + "\n"
+//        +   sampleReferenceBeacons.get(1) + '\n' +
+//        sampleReferenceBeacons.get(2)+'\n');
+        for(int i = 0; i < 3 /*Por enquanto este tamanho é 3*/;i++){
+            if(!distancePacks.get(i).getReferBeacon().equals(sampleReferenceBeacons.get(i).getAddress())){
+                Distance realDistance = searchBeaconOnDistancePack(distancePacks,sampleReferenceBeacons.get(i));
+
+                //Swapping the distances
+                Distance aux = new Distance(distancePacks.get(i).getTheDistance(),distancePacks.get(i).getReferBeacon());
+                distancePacks.get(i).setReferBeacon(realDistance.getReferBeacon());
+                distancePacks.get(i).setTheDistance(realDistance.getTheDistance());
+                realDistance.setReferBeacon(aux.getReferBeacon());
+                realDistance.setTheDistance(aux.getTheDistance());
+            }
+        }
+
+        Log.d(TAG, "--------Depois de organizar--------\n" + distancePacks + "\n\n");
+    }
+
+    private static void swap(Object o1, Object o2){
+        Object aux = o1;
+        o1 = o2;
+        o2 = aux;
+    }
+
+    private static Distance searchBeaconOnDistancePack(ArrayList<Distance> distance, Beacon beacon){
+        Distance theReturn = null;
+        for (Distance d: distance) {
+            if(d.getReferBeacon().equals(beacon.getAddress())){
+                theReturn = d;
+            }
+        }
+        Log.d(TAG, "searchBeaconOnDistancePack: Não encontrado");
+        return theReturn;
+    }
 }

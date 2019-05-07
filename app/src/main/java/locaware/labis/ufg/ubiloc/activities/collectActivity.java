@@ -1,13 +1,9 @@
 package locaware.labis.ufg.ubiloc.activities;
 
-import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,15 +13,12 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 
 import locaware.labis.ufg.ubiloc.Database.FbDatabase;
 import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.Beacon;
 import locaware.labis.ufg.ubiloc.classes.BluetoothUtils;
 import locaware.labis.ufg.ubiloc.classes.House;
-import locaware.labis.ufg.ubiloc.classes.Position;
-import locaware.labis.ufg.ubiloc.classes.Room;
 import locaware.labis.ufg.ubiloc.classes.Utils;
 import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
 
@@ -94,8 +87,8 @@ public class collectActivity extends AppCompatActivity {
 
                     //Gera objeto Beacon de referência a 1m
                     referencesBeacons.add(Utils.getReferenceBeacon(discoveredDevices));
-                    
-                    //TODO Temos que dar um clear em discoveredDevices
+
+                    discoveredDevices.clear();
 
                     String message = "~ MAC: " + referencesBeacons.get(beaconsQtdDetected).getAddress() +
                             " Média de potência: " + referencesBeacons.get(beaconsQtdDetected).getRssi() +

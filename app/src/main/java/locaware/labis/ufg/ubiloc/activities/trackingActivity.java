@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.lemmingapex.trilateration.NonLinearLeastSquaresSolver;
 import com.lemmingapex.trilateration.TrilaterationFunction;
@@ -18,7 +17,6 @@ import org.altbeacon.beacon.distance.ModelSpecificDistanceCalculator;
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
 import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer;
 
-import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,10 +25,6 @@ import locaware.labis.ufg.ubiloc.Database.FbDatabase;
 import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.Beacon;
 import locaware.labis.ufg.ubiloc.classes.BluetoothUtils;
-import locaware.labis.ufg.ubiloc.classes.Distance;
-import locaware.labis.ufg.ubiloc.classes.House;
-import locaware.labis.ufg.ubiloc.classes.Position;
-import locaware.labis.ufg.ubiloc.classes.Room;
 import locaware.labis.ufg.ubiloc.classes.Utils;
 import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
 
@@ -130,7 +124,7 @@ public class trackingActivity extends AppCompatActivity {
 
 
     private void calculateDistance(ArrayList<Beacon> reference, Beacon current){
-        double theDistance = -2;
+        double distance = -2;
         //Percorre a lista até achar o beacon que está sendo escaneado
         for (Beacon ref: reference) {
             if (ref.getAddress().equals(current.getAddress())) {
@@ -140,9 +134,13 @@ public class trackingActivity extends AppCompatActivity {
                 ModelSpecificDistanceCalculator modelSpecificDistanceCalculator
                         = new ModelSpecificDistanceCalculator(context,"teste");
 
-                theDistance = modelSpecificDistanceCalculator.calculateDistance(ref.getRssi(),(double) current.getRssi());
+                distance = modelSpecificDistanceCalculator.calculateDistance(ref.getRssi(),(double) current.getRssi());
+                Distance theDistance = new Distance(distance,ref.getAddress());
                 if(distancePacks.size() < 3){
-                    Utils.addDistance(distancePacks,new Distance(theDistance,ref.getAddress()));
+                    //Só adiciona esta distância se ela não estiver no pacote
+                    if(!isOnPacket(theDistance)){
+                        Utils.addDistance(distancePacks,theDistance);
+                    }
                 }else{
                     calculatePosition(distancePacks);
                     showPosition(positionTextView,position);
@@ -153,8 +151,8 @@ public class trackingActivity extends AppCompatActivity {
     }
 
     private void calculatePosition(ArrayList<Distance> distancePacks){
-        Room sampleRoom = Buffer.getHouseBuffer().getLastRoom();
         ArrayList<Beacon> sampleReferenceBeacons = Buffer.getHouseBuffer().getLastRoom().getReferencesBeacons();
+
         //TODO fazer a posição ser adquirida a partir da posição de cada instância do beacon no quarto
         double[] pos_b1 = {sampleReferenceBeacons.get(0).getBeacon_position().getX() ,
                 sampleReferenceBeacons.get(0).getBeacon_position().getY()};
@@ -162,6 +160,8 @@ public class trackingActivity extends AppCompatActivity {
                 sampleReferenceBeacons.get(1).getBeacon_position().getY()   };
         double[] pos_b3 = {sampleReferenceBeacons.get(2).getBeacon_position().getX(),
                 sampleReferenceBeacons.get(2).getBeacon_position().getY()};
+
+        Utils.organizeDistancePacks(distancePacks,sampleReferenceBeacons);
 
         double rad_b1 = distancePacks.get(0).getTheDistance();
         double rad_b2 = distancePacks.get(1).getTheDistance();
@@ -177,9 +177,23 @@ public class trackingActivity extends AppCompatActivity {
         // the answer
         position = optimum.getPoint().toArray();
 
+        //This put the user position in Firebase
         FbDatabase.updateUserPosition(new Position(position[0], position[1]));
 
+        //This put the beacons distance in Firebase  (just for test)
+        FbDatabase.updateBeaconsDistance(distancePacks);
+
         Log.d(TAG, "calculatePosition: Position:" + position[0] + ", " + position[1] + "\n");
+    }
+
+    private boolean isOnPacket(Distance distance){
+        for(Distance d: distancePacks){
+            if(d.getReferBeacon().equals(distance.getReferBeacon())){
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
