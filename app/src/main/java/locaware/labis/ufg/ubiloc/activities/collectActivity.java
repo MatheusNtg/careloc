@@ -3,7 +3,6 @@ package locaware.labis.ufg.ubiloc.activities;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,13 +13,12 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import locaware.labis.ufg.ubiloc.Database.FbDatabase;
 import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.Beacon;
 import locaware.labis.ufg.ubiloc.classes.BluetoothUtils;
 import locaware.labis.ufg.ubiloc.classes.House;
-import locaware.labis.ufg.ubiloc.classes.Utils;
-import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
+import locaware.labis.ufg.ubiloc.innerDatabase.HouseBuffer;
+import locaware.labis.ufg.ubiloc.innerDatabase.UsernameBuffer;
 
 public class collectActivity extends AppCompatActivity {
 
@@ -34,7 +32,7 @@ public class collectActivity extends AppCompatActivity {
     ArrayList<Beacon> discoveredDevices = new ArrayList<>();
     ArrayList<Beacon> referencesBeacons = new ArrayList<>();
     int beaconsQtdDetected = 0;
-    House workingHouse = Buffer.getHouseBuffer();
+    House workingHouse = HouseBuffer.getHouseBuffer();
 
 
     //Consts
@@ -85,30 +83,8 @@ public class collectActivity extends AppCompatActivity {
                     Log.d(TAG, "~ Parando descoberta de dispositivos");
                     bluetoothAdapter.stopLeScan(leScanCallBack);
 
-                    //Gera objeto Beacon de referência a 1m
-                    referencesBeacons.add(Utils.getReferenceBeacon(discoveredDevices));
-
                     discoveredDevices.clear();
 
-                    String message = "~ MAC: " + referencesBeacons.get(beaconsQtdDetected).getAddress() +
-                            " Média de potência: " + referencesBeacons.get(beaconsQtdDetected).getRssi() +
-                            "Position: " + referencesBeacons.get(beaconsQtdDetected).getBeacon_position().getX() +
-                            ", " + referencesBeacons.get(beaconsQtdDetected).getBeacon_position().getY();
-
-                    Toast.makeText(context,message,Toast.LENGTH_LONG).show();
-
-                    //Verifica se os 3 beacons de um quarto já foram detectados
-                    if(beaconsQtdDetected == 2){
-                        //Coloca os beacons de referência na casa que está sendo cadastrada
-                        // TODO Tornar esta parte escalável
-                        workingHouse.getRooms().get(0).setReferencesBeacons(referencesBeacons);
-                        FbDatabase.writeHouse(workingHouse);
-                        //Inicia a próxima activity
-                        Intent intent = new Intent(context,trackingActivity.class);
-                        startActivity(intent);
-                    }else{
-                        beaconsQtdDetected++;
-                    }
                 }
             },SCAN_PERIOD);
 
@@ -128,29 +104,7 @@ public class collectActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    //Adiciona os dispositivos encontrados no array list dos devices
-                    switch (beaconsQtdDetected){
-                        case 0:
-                            discoveredDevices.add(new Beacon(rssi,device.getAddress(), new Position(
-                                    Buffer.getHouseBuffer().getLastRoom().getWidth(),
-                                    Buffer.getHouseBuffer().getLastRoom().getHeight()/2
-                            )));
-                            break;
-                        case 1:
-                            discoveredDevices.add(new Beacon(rssi,device.getAddress(), new Position(
-                                    Buffer.getHouseBuffer().getLastRoom().getWidth()/2,
-                                    0
-                            )));
-                            break;
-                        case 2:
-                            discoveredDevices.add(new Beacon(rssi,device.getAddress(), new Position(
-                                    0,
-                                    Buffer.getHouseBuffer().getLastRoom().getHeight()/2
-                            )));
-                            break;
-                        default:
-                            Log.d(TAG, "Deu algo de ruim no switch case");
-                    }
+
                 }
             });
 

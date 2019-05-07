@@ -3,18 +3,13 @@ package locaware.labis.ufg.ubiloc.classes;
 import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
-
-import locaware.labis.ufg.ubiloc.activities.trackingActivity;
-import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
 
 public class BluetoothUtils {
     private final Activity mActivity;

@@ -14,7 +14,7 @@ import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.House;
 import locaware.labis.ufg.ubiloc.classes.User;
 import locaware.labis.ufg.ubiloc.classes.Utils;
-import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
+import locaware.labis.ufg.ubiloc.innerDatabase.UsernameBuffer;
 
 public class userConfigActivity extends AppCompatActivity {
 
@@ -69,7 +69,7 @@ public class userConfigActivity extends AppCompatActivity {
                     house.setName(mNewHouseEditText.getText().toString());
                     house.setUserAtArrayPosition(0,user);
 
-                    Buffer.setHouseBuffer(house);
+                    UsernameBuffer.setHouseBuffer(house);
 
                     Log.d(TAG, "Nova casa adicionada ao buffer");
 

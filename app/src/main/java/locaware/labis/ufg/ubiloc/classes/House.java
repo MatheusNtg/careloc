@@ -3,14 +3,24 @@ package locaware.labis.ufg.ubiloc.classes;
 import java.util.ArrayList;
 
 public class House {
+    String name;
     ArrayList users = new ArrayList<User>();
     ArrayList rooms = new ArrayList<Room>();
 
     public House(){}
 
-    public House(ArrayList users, ArrayList rooms) {
+    public House(String name, ArrayList users, ArrayList rooms) {
+        this.name = name;
         this.users = users;
         this.rooms = rooms;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public ArrayList getUsers() {

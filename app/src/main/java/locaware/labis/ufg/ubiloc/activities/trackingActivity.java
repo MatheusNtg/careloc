@@ -26,7 +26,7 @@ import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.Beacon;
 import locaware.labis.ufg.ubiloc.classes.BluetoothUtils;
 import locaware.labis.ufg.ubiloc.classes.Utils;
-import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
+import locaware.labis.ufg.ubiloc.innerDatabase.UsernameBuffer;
 
 public class trackingActivity extends AppCompatActivity {
 
@@ -45,7 +45,7 @@ public class trackingActivity extends AppCompatActivity {
     private ArrayList<Distance> distancePacks = new ArrayList<>();
     private double[] position = new double[2];
 
-    ArrayList<Beacon> referencesBeacons = Buffer.getHouseBuffer().getLastRoom().getReferencesBeacons();
+    ArrayList<Beacon> referencesBeacons = UsernameBuffer.getHouseBuffer().getLastRoom().getReferencesBeacons();
 
 
 
@@ -151,7 +151,7 @@ public class trackingActivity extends AppCompatActivity {
     }
 
     private void calculatePosition(ArrayList<Distance> distancePacks){
-        ArrayList<Beacon> sampleReferenceBeacons = Buffer.getHouseBuffer().getLastRoom().getReferencesBeacons();
+        ArrayList<Beacon> sampleReferenceBeacons = UsernameBuffer.getHouseBuffer().getLastRoom().getReferencesBeacons();
 
         //TODO fazer a posição ser adquirida a partir da posição de cada instância do beacon no quarto
         double[] pos_b1 = {sampleReferenceBeacons.get(0).getBeacon_position().getX() ,
