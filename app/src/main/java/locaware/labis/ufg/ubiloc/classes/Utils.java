@@ -3,6 +3,9 @@ package locaware.labis.ufg.ubiloc.classes;
 import android.os.Handler;
 import android.widget.EditText;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+
 public class Utils {
 
     private static final String TAG = "Teste";
@@ -17,5 +20,18 @@ public class Utils {
         }else{
             return Boolean.FALSE;
         }
+    }
+
+    public static void cleanEditText(EditText editText){
+        editText.setText("");
+    }
+
+    public static void sortDiscoveredDevices(ArrayList<Beacon> devices){
+        devices.sort(new Comparator<Beacon>() {
+            @Override
+            public int compare(Beacon o1, Beacon o2) {
+                return o2.getRssi() - o1.getRssi();
+            }
+        });
     }
 }

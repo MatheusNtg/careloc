@@ -13,6 +13,7 @@ import android.widget.Toast;
 import locaware.labis.ufg.ubiloc.Database.FbDatabase;
 import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.Utils;
+import locaware.labis.ufg.ubiloc.innerDatabase.HouseBuffer;
 import locaware.labis.ufg.ubiloc.innerDatabase.UsernameBuffer;
 
 public class MainActivity extends AppCompatActivity {
@@ -76,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void callback(String username) {
             UsernameBuffer.setUsernameFlag(username);
-            UsernameBuffer.loadBufferFromUsername(username,new UsernameBuffer.bufferLoadedCallback() {
+            HouseBuffer.loadHouseBufferFromUsername(username,new HouseBuffer.bufferLoadedCallback() {
                 @Override
                 public void callback() {
                     Intent intent = new Intent(context, trackingActivity.class);

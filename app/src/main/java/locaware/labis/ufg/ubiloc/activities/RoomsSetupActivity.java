@@ -1,6 +1,7 @@
 package locaware.labis.ufg.ubiloc.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -11,7 +12,9 @@ import android.widget.Toast;
 
 import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.House;
+import locaware.labis.ufg.ubiloc.classes.Room;
 import locaware.labis.ufg.ubiloc.classes.Utils;
+import locaware.labis.ufg.ubiloc.innerDatabase.ActivityBuffer;
 import locaware.labis.ufg.ubiloc.innerDatabase.HouseBuffer;
 import locaware.labis.ufg.ubiloc.innerDatabase.UsernameBuffer;
 
@@ -21,18 +24,19 @@ public class RoomsSetupActivity extends AppCompatActivity {
     private final String TAG = "Debug";
 
     //Activity elements
-    EditText mRoomNameEditText;
-    TextView mRoomNumberTextView;
-    Button mConfirmButton;
+    private EditText mRoomNameEditText;
+    private TextView mRoomNumberTextView;
+    private Button mConfirmButton;
 
     //Vars
-    int roomNumber = 1;
+    private int roomNumber = 1;
+    private int roomNumberLimit = ActivityBuffer.getRoomsToCreate();
+    private House workingHouse = HouseBuffer.getHouseBuffer();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rooms_setup);
-
         //Context
         final Context context = this;
 
@@ -51,11 +55,20 @@ public class RoomsSetupActivity extends AppCompatActivity {
 
                 //Check if all fields are filled
                 if(!Utils.isTextFieldEmpty(mRoomNameEditText)){
+                    // Take the info from edit text and put them on working house
+                    String roomName = mRoomNameEditText.getText().toString();
+                    Room actualRoom = new Room(null,roomName);
+                    workingHouse.addRoomToArray(actualRoom);
 
-                    House workingHouse = HouseBuffer.getHouseBuffer();
-
-
-
+                    roomNumber++;
+                    //If all rooms have been registered start the collect activity
+                    if(roomNumber > roomNumberLimit){
+                        Intent intent = new Intent(context,collectActivity.class);
+                        startActivity(intent);
+                    }else{
+                        mRoomNumberTextView.setText("Quarto " + roomNumber);
+                        Utils.cleanEditText(mRoomNameEditText);
+                    }
                 }else{
                     Toast.makeText(context,"Preencha todos os campos corretamente", Toast.LENGTH_SHORT).show();
                 }

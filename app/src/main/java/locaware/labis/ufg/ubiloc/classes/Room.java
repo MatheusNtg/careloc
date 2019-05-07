@@ -3,8 +3,8 @@ package locaware.labis.ufg.ubiloc.classes;
 import java.util.ArrayList;
 
 public class Room {
-    Beacon referenceBeacon;
-    String name;
+    private Beacon referenceBeacon;
+    private String name;
 
     public Room(){}
 

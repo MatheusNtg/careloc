@@ -3,9 +3,9 @@ package locaware.labis.ufg.ubiloc.classes;
 import java.util.ArrayList;
 
 public class House {
-    String name;
-    ArrayList users = new ArrayList<User>();
-    ArrayList rooms = new ArrayList<Room>();
+    private String name;
+    private ArrayList users = new ArrayList<User>();
+    private ArrayList rooms = new ArrayList<Room>();
 
     public House(){}
 
@@ -37,5 +37,13 @@ public class House {
 
     public void setRooms(ArrayList rooms) {
         this.rooms = rooms;
+    }
+
+    public void addUserToArray(User user){
+        users.add(user);
+    }
+
+    public void addRoomToArray(Room room){
+        rooms.add(room);
     }
 }

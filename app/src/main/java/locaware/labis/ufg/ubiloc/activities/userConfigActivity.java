@@ -1,5 +1,6 @@
 package locaware.labis.ufg.ubiloc.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -10,10 +11,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.House;
+import locaware.labis.ufg.ubiloc.classes.Room;
 import locaware.labis.ufg.ubiloc.classes.User;
 import locaware.labis.ufg.ubiloc.classes.Utils;
+import locaware.labis.ufg.ubiloc.innerDatabase.ActivityBuffer;
+import locaware.labis.ufg.ubiloc.innerDatabase.HouseBuffer;
 import locaware.labis.ufg.ubiloc.innerDatabase.UsernameBuffer;
 
 public class userConfigActivity extends AppCompatActivity {
@@ -61,22 +67,20 @@ public class userConfigActivity extends AppCompatActivity {
                     house = new House();
                     user  = new User();
 
+                    //Set the properties
                     user.setName(mNewUserEditText.getText().toString());
-                    user.setPosition(new Position(0,0));
+                    user.setPosition(new Room(null,"Vazia"));
 
-                    //Setting up the house
-                    house.setQtdRooms(Integer.valueOf(mQtdRoomsEditText.getText().toString()));
                     house.setName(mNewHouseEditText.getText().toString());
-                    house.setUserAtArrayPosition(0,user);
+                    house.addUserToArray(user);
 
-                    UsernameBuffer.setHouseBuffer(house);
+                    ActivityBuffer.setRoomsToCreate(Integer.parseInt(mQtdRoomsEditText.getText().toString()));
+                    HouseBuffer.setHouseBuffer(house);
 
-                    Log.d(TAG, "Nova casa adicionada ao buffer");
 
                     //Start a new Activity
                     Intent intent = new Intent(context,RoomsSetupActivity.class);
                     startActivity(intent);
-                    Log.d(TAG, "onClick: ~ Tela de configuração dos quartos iniciada");
                 }else{ //If some field is wrong or not filled
                     Toast.makeText(context,"Preencha todos os campos corretamente", Toast.LENGTH_SHORT).show();
                 }
