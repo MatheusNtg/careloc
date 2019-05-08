@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -29,7 +30,8 @@ public class collectActivity extends AppCompatActivity {
 
 
     //Activities elements
-    Button mDetectButton;
+    private Button mDetectButton;
+    private TextView mgotoTextView;
 
     //Variables
     private BluetoothUtils btUtils;
@@ -44,7 +46,7 @@ public class collectActivity extends AppCompatActivity {
     private final String TAG = "Debug";
     private final Context context = this;
     // Stops scanning after 10 seconds.
-    private static final long SCAN_PERIOD = 10000;
+    private static final long SCAN_PERIOD = 5000;
 
 
     @Override
@@ -55,6 +57,7 @@ public class collectActivity extends AppCompatActivity {
         //Setting up the activity elemets
         mDetectButton = findViewById(R.id.detectButton);
         btUtils = new BluetoothUtils(this);
+        mgotoTextView = findViewById(R.id.gotoTextView);
 
 
         btUtils.checkBLEOnDevice();
@@ -62,6 +65,8 @@ public class collectActivity extends AppCompatActivity {
         btUtils.enableBT();
 
         btUtils.checkBTPermissions();
+
+        mgotoTextView.setText("Vá para: " + rooms.get(numberOfWorkingRoom).getName());
 
         mDetectButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,9 +97,9 @@ public class collectActivity extends AppCompatActivity {
                     Utils.sortDiscoveredDevices(discoveredDevices);
 
                     //Pick the first of the array (the stronger one) and put as the reference for that room
-                    rooms.get(numberOfWorkingRoom++).setReferenceBeacon(discoveredDevices.get(0));
+                    rooms.get(numberOfWorkingRoom).setReferenceBeacon(discoveredDevices.get(0));
 
-
+                    numberOfWorkingRoom++;
                     //Clean the discovered devices list
                     discoveredDevices.clear();
 
@@ -103,6 +108,8 @@ public class collectActivity extends AppCompatActivity {
                         FbDatabase.writeHouse(workingHouse);
                         Intent intent = new Intent(context, trackingActivity.class);
                         startActivity(intent);
+                    }else{
+                        mgotoTextView.setText("Vá para: " + rooms.get(numberOfWorkingRoom).getName());
                     }
                 }
             },SCAN_PERIOD);

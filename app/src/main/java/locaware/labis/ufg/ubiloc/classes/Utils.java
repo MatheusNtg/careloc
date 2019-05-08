@@ -2,6 +2,7 @@ package locaware.labis.ufg.ubiloc.classes;
 
 import android.os.Handler;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -33,5 +34,18 @@ public class Utils {
                 return o2.getRssi() - o1.getRssi();
             }
         });
+    }
+
+    public static Room searchRoomByBeacon(ArrayList<Room> rooms, Beacon beacon){
+        for (Room r: rooms) {
+            if(beacon.getMac_address().equals(r.getReferenceBeacon().getMac_address())){
+                return r;
+            }
+        }
+        return null;
+    }
+
+    public static void updateTextView(TextView textView,String message){
+        textView.setText(message);
     }
 }

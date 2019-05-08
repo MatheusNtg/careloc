@@ -4,6 +4,10 @@ public class Beacon {
     private String mac_address;
     private int rssi;
 
+    public Beacon(String mac_address){
+        this.mac_address = mac_address;
+    }
+
     public Beacon(String mac_address,int rssi) {
         this.mac_address = mac_address;
         this.rssi        = rssi;

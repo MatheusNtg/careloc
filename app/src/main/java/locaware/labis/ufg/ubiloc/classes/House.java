@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 public class House {
     private String name;
-    private ArrayList users = new ArrayList<User>();
-    private ArrayList rooms = new ArrayList<Room>();
+    private ArrayList<User> users = new ArrayList<User>();
+    private ArrayList<Room> rooms = new ArrayList<Room>();
 
     public House(){}
 
