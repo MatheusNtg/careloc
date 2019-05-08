@@ -4,10 +4,13 @@ import java.util.ArrayList;
 
 public class House {
     private String name;
-    private ArrayList<User> users = new ArrayList<User>();
-    private ArrayList<Room> rooms = new ArrayList<Room>();
+    private ArrayList<User> users;
+    private ArrayList<Room> rooms;
 
-    public House(){}
+    public House(){
+        users = new ArrayList<User>();
+        rooms = new ArrayList<Room>();
+    }
 
     public House(String name, ArrayList users, ArrayList rooms) {
         this.name = name;
@@ -23,19 +26,19 @@ public class House {
         this.name = name;
     }
 
-    public ArrayList getUsers() {
+    public ArrayList<User> getUsers() {
         return users;
     }
 
-    public void setUsers(ArrayList users) {
+    public void setUsers(ArrayList<User> users) {
         this.users = users;
     }
 
-    public ArrayList getRooms() {
+    public ArrayList<Room> getRooms() {
         return rooms;
     }
 
-    public void setRooms(ArrayList rooms) {
+    public void setRooms(ArrayList<Room> rooms) {
         this.rooms = rooms;
     }
 

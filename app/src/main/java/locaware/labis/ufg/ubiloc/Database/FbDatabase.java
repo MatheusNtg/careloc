@@ -1,17 +1,23 @@
 package locaware.labis.ufg.ubiloc.Database;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import locaware.labis.ufg.ubiloc.activities.trackingActivity;
 import locaware.labis.ufg.ubiloc.classes.House;
+import locaware.labis.ufg.ubiloc.innerDatabase.HouseBuffer;
 
 public class FbDatabase {
 
@@ -21,7 +27,6 @@ public class FbDatabase {
     //Const
     private static final String USERNAMES_PATH = "users";
     //Variables
-    private static boolean result;
     private static DatabaseReference usernameByReference = null;
 
 
@@ -34,24 +39,34 @@ public class FbDatabase {
                 .child(house.getName()).setValue(house);
     }
 
-    public static void hasTheUsername(final String username, final HasTheUserCallback hasTheUserCallback, final Context context){
-        final DatabaseReference reference = mDatabase.child(TOP_PARENT_HOUSE);
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-
+    public static void checkTheUsername(final Context context, final String username){
+        DatabaseReference houses = mDatabase.child(TOP_PARENT_HOUSE);
+        houses.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot d : dataSnapshot.getChildren()) {
-                        if (d.child("users").child("0").child("name").getValue().toString().equals(username)) {
-                            hasTheUserCallback.callback(username);
-                            return;
+                Query query;
+                for (DataSnapshot d: dataSnapshot.getChildren()) {
+                    query = d.child("users").getRef().orderByChild("name").equalTo(username);
+                    query.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.getValue() != null){
+                                HouseBuffer.loadHouseBufferFromUsername(username, new HouseBuffer.bufferLoadedCallback() {
+                                    @Override
+                                    public void callback() {
+                                        Intent intent = new Intent(context,trackingActivity.class);
+                                        context.startActivity(intent);
+                                    }
+                                });
+                            }
                         }
-                    }
-                    Toast.makeText(context,"Usuário não encontrado",Toast.LENGTH_LONG).show();
-                } else {
-                    Log.d(TAG, "onDataChange: Base de dados está vazia");
-                }
 
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
             }
 
             @Override
@@ -59,11 +74,6 @@ public class FbDatabase {
 
             }
         });
-
-    }
-
-    public interface HasTheUserCallback{
-        void callback(String username);
     }
 
     private static void loadReferenceByUserName(final String username, final HouseLoadedCallback callback){

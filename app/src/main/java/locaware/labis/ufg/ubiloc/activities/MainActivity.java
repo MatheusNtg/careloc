@@ -63,28 +63,9 @@ public class MainActivity extends AppCompatActivity {
         mTrackingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FbDatabase.hasTheUsername(mUserNameEditText.getText().toString(),callback,context);
-
-                if(Utils.isTextFieldEmpty(mUserNameEditText)){
-                    Toast.makeText(context,"Por favor, digite um usuário válido",Toast.LENGTH_SHORT).show();
-                }
+                FbDatabase.checkTheUsername(context,mUserNameEditText.getText().toString());
             }
         });
     }
-
-
-    FbDatabase.HasTheUserCallback callback = new FbDatabase.HasTheUserCallback() {
-        @Override
-        public void callback(String username) {
-            UsernameBuffer.setUsernameFlag(username);
-            HouseBuffer.loadHouseBufferFromUsername(username,new HouseBuffer.bufferLoadedCallback() {
-                @Override
-                public void callback() {
-                    Intent intent = new Intent(context, trackingActivity.class);
-                    startActivity(intent);
-                }
-            });
-        }
-    };
 
 }
