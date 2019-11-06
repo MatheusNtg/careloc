@@ -3,33 +3,22 @@ package locaware.labis.ufg.ubiloc.classes;
 import java.util.ArrayList;
 
 public class Room {
-    private double width;
-    private double height;
+    private Beacon referenceBeacon;
     private String name;
-    private ArrayList<Beacon> referencesBeacons = new ArrayList<>();
 
-    public Room(){};
+    public Room(){}
 
-    public Room(double width, double height, String name) {
-        this.width = width;
-        this.height = height;
+    public Room(Beacon referenceBeacon, String name) {
+        this.referenceBeacon = referenceBeacon;
         this.name = name;
     }
 
-    public double getWidth() {
-        return width;
+    public Beacon getReferenceBeacon() {
+        return referenceBeacon;
     }
 
-    public void setWidth(double width) {
-        this.width = width;
-    }
-
-    public double getHeight() {
-        return height;
-    }
-
-    public void setHeight(double height) {
-        this.height = height;
+    public void setReferenceBeacon(Beacon referenceBeacon) {
+        this.referenceBeacon = referenceBeacon;
     }
 
     public String getName() {
@@ -38,17 +27,5 @@ public class Room {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public ArrayList<Beacon> getReferencesBeacons() {
-        return referencesBeacons;
-    }
-
-    public void setReferencesBeacons(ArrayList<Beacon> referencesBeacons) {
-        this.referencesBeacons = referencesBeacons;
-    }
-
-    public void addReferenceBeacon(Beacon b){
-        referencesBeacons.add(b);
     }
 }

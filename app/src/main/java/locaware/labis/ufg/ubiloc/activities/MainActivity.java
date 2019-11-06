@@ -1,6 +1,5 @@
 package locaware.labis.ufg.ubiloc.activities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -11,17 +10,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.firebase.database.DatabaseReference;
-import com.lemmingapex.trilateration.NonLinearLeastSquaresSolver;
-import com.lemmingapex.trilateration.TrilaterationFunction;
-
-import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
-import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer;
-
 import locaware.labis.ufg.ubiloc.Database.FbDatabase;
 import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.Utils;
-import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
+import locaware.labis.ufg.ubiloc.innerDatabase.HouseBuffer;
+import locaware.labis.ufg.ubiloc.innerDatabase.UsernameBuffer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -70,28 +63,9 @@ public class MainActivity extends AppCompatActivity {
         mTrackingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FbDatabase.hasTheUsername(mUserNameEditText.getText().toString(),callback,context);
-
-                if(Utils.isTextFieldEmpty(mUserNameEditText)){
-                    Toast.makeText(context,"Por favor, digite um usuário válido",Toast.LENGTH_SHORT).show();
-                }
+                FbDatabase.checkTheUsername(context,mUserNameEditText.getText().toString());
             }
         });
     }
-
-
-    FbDatabase.HasTheUserCallback callback = new FbDatabase.HasTheUserCallback() {
-        @Override
-        public void callback(String username) {
-            Buffer.setUsernameFlag(username);
-            Buffer.loadBufferFromUsername(username,new Buffer.bufferLoadedCallback() {
-                @Override
-                public void callback() {
-                    Intent intent = new Intent(context, trackingActivity.class);
-                    startActivity(intent);
-                }
-            });
-        }
-    };
 
 }

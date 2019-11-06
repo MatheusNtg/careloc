@@ -1,13 +1,21 @@
 package locaware.labis.ufg.ubiloc.classes;
 
 public class User {
-    private String name;
-    private Position position;
+    Room position;
+    String name;
 
     public User(){}
 
-    public User(String name, Position position) {
+    public User(Room position, String name) {
+        this.position = position;
         this.name = name;
+    }
+
+    public Room getPosition() {
+        return position;
+    }
+
+    public void setPosition(Room position) {
         this.position = position;
     }
 
@@ -17,13 +25,5 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Position getPosition() {
-        return position;
-    }
-
-    public void setPosition(Position position) {
-        this.position = position;
     }
 }

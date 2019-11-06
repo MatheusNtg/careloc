@@ -3,6 +3,8 @@ package locaware.labis.ufg.ubiloc.activities;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,7 +20,6 @@ import org.altbeacon.beacon.distance.ModelSpecificDistanceCalculator;
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
 import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer;
 
-import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,33 +28,30 @@ import locaware.labis.ufg.ubiloc.Database.FbDatabase;
 import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.Beacon;
 import locaware.labis.ufg.ubiloc.classes.BluetoothUtils;
-import locaware.labis.ufg.ubiloc.classes.Distance;
 import locaware.labis.ufg.ubiloc.classes.House;
-import locaware.labis.ufg.ubiloc.classes.Position;
 import locaware.labis.ufg.ubiloc.classes.Room;
 import locaware.labis.ufg.ubiloc.classes.Utils;
-import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
+import locaware.labis.ufg.ubiloc.innerDatabase.ActivityBuffer;
+import locaware.labis.ufg.ubiloc.innerDatabase.HouseBuffer;
+import locaware.labis.ufg.ubiloc.innerDatabase.UsernameBuffer;
 
 public class trackingActivity extends AppCompatActivity {
 
     //Consts
     private Context context;
     private final String TAG = "Debug";
-    private final long PERIOD = 1500;
+    private final long SCAN_PERIOD = 1000;
 
     //Activity elements
-    private TextView positionTextView;
-    private Button positionButton;
+    private TextView mpositionTextView;
 
     //Vars
     private BluetoothUtils bluetoothUtils;
-    private String beaconAddress = "Erro";
-    private ArrayList<Distance> distancePacks = new ArrayList<>();
-    private double[] position = new double[2];
-
-    ArrayList<Beacon> referencesBeacons = Buffer.getHouseBuffer().getLastRoom().getReferencesBeacons();
-
-
+    private House workingHouse = HouseBuffer.getHouseBuffer();
+    private ArrayList<Beacon> scanPackets = new ArrayList<Beacon>();
+    private Handler handler = new Handler();
+    private Timer timer = new Timer();
+    protected Room actualRoom = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,9 +68,8 @@ public class trackingActivity extends AppCompatActivity {
         }
 
         //Setting up the activity elements
-        positionButton   = findViewById(R.id.positionButton);
-        positionTextView = findViewById(R.id.positionTextView);
         context          = this;
+        mpositionTextView = findViewById(R.id.positionTextView);
 
         //Setting up the bt utils
         bluetoothUtils = new BluetoothUtils(this);
@@ -80,20 +77,7 @@ public class trackingActivity extends AppCompatActivity {
         scanLEDevices(bluetoothUtils.getBluetoothAdapter());
 
         //Listeners
-        positionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showPosition(positionTextView,position);
-            }
-        });
 
-        //Just for debug TODO Erase this later
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Log.d(TAG, "Debug---->" + distancePacks);
-            }
-        },0,PERIOD);
 
     }
 
@@ -101,8 +85,28 @@ public class trackingActivity extends AppCompatActivity {
     private void scanLEDevices(final BluetoothAdapter bluetoothAdapter){
         if(bluetoothAdapter.isEnabled()){
             bluetoothAdapter.startLeScan(leScanCallBack);
+
+
+            timer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    if(scanPackets.size() > 0){
+                         Utils.sortDiscoveredDevices(scanPackets);
+                         actualRoom = Utils.searchRoomByBeacon(workingHouse.getRooms(),scanPackets.get(0));
+                    }
+                    if(actualRoom != null){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Utils.updateTextView(mpositionTextView,trackingActivity.this.actualRoom.getName());
+                            }
+                        });
+                    }
+                    scanPackets.clear();
+                }
+            },0,SCAN_PERIOD);
         }else{
-//            Toast.makeText(context,"Bluetooth desligado, por favor, ligue o bluetooth", Toast.LENGTH_SHORT);
+            Toast.makeText(context,"Bluetooth desligado, por favor, ligue o bluetooth", Toast.LENGTH_SHORT);
         }
     }
 
@@ -112,75 +116,11 @@ public class trackingActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Beacon currentBeacon = new Beacon(rssi,device.getAddress());
-                    calculateDistance(referencesBeacons,currentBeacon);
+                    scanPackets.add(new Beacon(device.getAddress(),rssi));
                 }
             });
 
 
         }
     };
-
-    private void showPosition(TextView text, double[] position){
-        if(position.length != 0) {
-            text.setText("x: " + String.format("%.2f", position[0]) +
-                    "y: " + String.format("%.2f",position[1]));
-        }
-    }
-
-
-    private void calculateDistance(ArrayList<Beacon> reference, Beacon current){
-        double theDistance = -2;
-        //Percorre a lista até achar o beacon que está sendo escaneado
-        for (Beacon ref: reference) {
-            if (ref.getAddress().equals(current.getAddress())) {
-                beaconAddress = current.getAddress();
-
-                //Teste
-                ModelSpecificDistanceCalculator modelSpecificDistanceCalculator
-                        = new ModelSpecificDistanceCalculator(context,"teste");
-
-                theDistance = modelSpecificDistanceCalculator.calculateDistance(ref.getRssi(),(double) current.getRssi());
-                if(distancePacks.size() < 3){
-                    Utils.addDistance(distancePacks,new Distance(theDistance,ref.getAddress()));
-                }else{
-                    calculatePosition(distancePacks);
-                    showPosition(positionTextView,position);
-                    distancePacks.clear();
-                }
-            }
-        }
-    }
-
-    private void calculatePosition(ArrayList<Distance> distancePacks){
-        Room sampleRoom = Buffer.getHouseBuffer().getLastRoom();
-        ArrayList<Beacon> sampleReferenceBeacons = Buffer.getHouseBuffer().getLastRoom().getReferencesBeacons();
-        //TODO fazer a posição ser adquirida a partir da posição de cada instância do beacon no quarto
-        double[] pos_b1 = {sampleReferenceBeacons.get(0).getBeacon_position().getX() ,
-                sampleReferenceBeacons.get(0).getBeacon_position().getY()};
-        double[] pos_b2 = {sampleReferenceBeacons.get(1).getBeacon_position().getX(),
-                sampleReferenceBeacons.get(1).getBeacon_position().getY()   };
-        double[] pos_b3 = {sampleReferenceBeacons.get(2).getBeacon_position().getX(),
-                sampleReferenceBeacons.get(2).getBeacon_position().getY()};
-
-        double rad_b1 = distancePacks.get(0).getTheDistance();
-        double rad_b2 = distancePacks.get(1).getTheDistance();
-        double rad_b3 = distancePacks.get(2).getTheDistance();
-
-        double[][] beacons_positions = new double[][] { pos_b1, pos_b2, pos_b3};
-
-        double[] distances = new double[] {rad_b1,rad_b2,rad_b3};
-
-        NonLinearLeastSquaresSolver solver = new NonLinearLeastSquaresSolver(new TrilaterationFunction(beacons_positions, distances), new LevenbergMarquardtOptimizer());
-        LeastSquaresOptimizer.Optimum optimum = solver.solve();
-
-        // the answer
-        position = optimum.getPoint().toArray();
-
-        FbDatabase.updateUserPosition(new Position(position[0], position[1]));
-
-        Log.d(TAG, "calculatePosition: Position:" + position[0] + ", " + position[1] + "\n");
-    }
-
-
 }

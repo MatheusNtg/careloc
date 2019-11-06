@@ -1,55 +1,52 @@
 package locaware.labis.ufg.ubiloc.activities;
 
-import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 
 import locaware.labis.ufg.ubiloc.Database.FbDatabase;
 import locaware.labis.ufg.ubiloc.R;
 import locaware.labis.ufg.ubiloc.classes.Beacon;
 import locaware.labis.ufg.ubiloc.classes.BluetoothUtils;
 import locaware.labis.ufg.ubiloc.classes.House;
-import locaware.labis.ufg.ubiloc.classes.Position;
 import locaware.labis.ufg.ubiloc.classes.Room;
 import locaware.labis.ufg.ubiloc.classes.Utils;
-import locaware.labis.ufg.ubiloc.innerDatabase.Buffer;
+import locaware.labis.ufg.ubiloc.innerDatabase.ActivityBuffer;
+import locaware.labis.ufg.ubiloc.innerDatabase.HouseBuffer;
+import locaware.labis.ufg.ubiloc.innerDatabase.UsernameBuffer;
 
 public class collectActivity extends AppCompatActivity {
 
 
     //Activities elements
-    Button mDetectButton;
+    private Button mDetectButton;
+    private TextView mgotoTextView;
 
     //Variables
     private BluetoothUtils btUtils;
     private Handler handler = new Handler();
-    ArrayList<Beacon> discoveredDevices = new ArrayList<>();
-    ArrayList<Beacon> referencesBeacons = new ArrayList<>();
-    int beaconsQtdDetected = 0;
-    House workingHouse = Buffer.getHouseBuffer();
-
+    private ArrayList<Beacon> discoveredDevices = new ArrayList<>();
+    private House workingHouse = HouseBuffer.getHouseBuffer();
+    private int numberOfWorkingRoom = 0;
+    private ArrayList<Room> rooms = workingHouse.getRooms();
 
     //Consts
     private final int REQUEST_ENABLE_BT = 1;
     private final String TAG = "Debug";
     private final Context context = this;
     // Stops scanning after 10 seconds.
-    private static final long SCAN_PERIOD = 10000;
+    private static final long SCAN_PERIOD = 5000;
 
 
     @Override
@@ -60,6 +57,7 @@ public class collectActivity extends AppCompatActivity {
         //Setting up the activity elemets
         mDetectButton = findViewById(R.id.detectButton);
         btUtils = new BluetoothUtils(this);
+        mgotoTextView = findViewById(R.id.gotoTextView);
 
 
         btUtils.checkBLEOnDevice();
@@ -67,6 +65,8 @@ public class collectActivity extends AppCompatActivity {
         btUtils.enableBT();
 
         btUtils.checkBTPermissions();
+
+        mgotoTextView.setText("Vá para: " + rooms.get(numberOfWorkingRoom).getName());
 
         mDetectButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,37 +89,33 @@ public class collectActivity extends AppCompatActivity {
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(TAG, "~ Parando descoberta de dispositivos");
+                    Toast.makeText(context,"Descoberta encerrada",Toast.LENGTH_LONG).show();
                     bluetoothAdapter.stopLeScan(leScanCallBack);
 
-                    //Gera objeto Beacon de referência a 1m
-                    referencesBeacons.add(Utils.getReferenceBeacon(discoveredDevices));
-                    
-                    //TODO Temos que dar um clear em discoveredDevices
+                    //Todo add the reference beacon discovered by app
+                    //Sort the discovered devices
+                    Utils.sortDiscoveredDevices(discoveredDevices);
 
-                    String message = "~ MAC: " + referencesBeacons.get(beaconsQtdDetected).getAddress() +
-                            " Média de potência: " + referencesBeacons.get(beaconsQtdDetected).getRssi() +
-                            "Position: " + referencesBeacons.get(beaconsQtdDetected).getBeacon_position().getX() +
-                            ", " + referencesBeacons.get(beaconsQtdDetected).getBeacon_position().getY();
+                    //Pick the first of the array (the stronger one) and put as the reference for that room
+                    rooms.get(numberOfWorkingRoom).setReferenceBeacon(discoveredDevices.get(0));
 
-                    Toast.makeText(context,message,Toast.LENGTH_LONG).show();
+                    numberOfWorkingRoom++;
+                    //Clean the discovered devices list
+                    discoveredDevices.clear();
 
-                    //Verifica se os 3 beacons de um quarto já foram detectados
-                    if(beaconsQtdDetected == 2){
-                        //Coloca os beacons de referência na casa que está sendo cadastrada
-                        // TODO Tornar esta parte escalável
-                        workingHouse.getRooms().get(0).setReferencesBeacons(referencesBeacons);
+                    //If the user has covered all house, then write in database and start the tracking activity
+                    if(numberOfWorkingRoom == ActivityBuffer.getRoomsToCreate()){
                         FbDatabase.writeHouse(workingHouse);
-                        //Inicia a próxima activity
-                        Intent intent = new Intent(context,trackingActivity.class);
+                        Intent intent = new Intent(context, trackingActivity.class);
                         startActivity(intent);
                     }else{
-                        beaconsQtdDetected++;
+                        mgotoTextView.setText("Vá para: " + rooms.get(numberOfWorkingRoom).getName());
                     }
                 }
             },SCAN_PERIOD);
 
             Log.d(TAG, "~ scanLEDevices: Descoberta iniciada");
+            Toast.makeText(context,"Descoberta iniciada",Toast.LENGTH_LONG).show();
             bluetoothAdapter.startLeScan(leScanCallBack);
         }else{
             Toast.makeText(context,"Bluetooth desligado, por favor, ligue o bluetooth", Toast.LENGTH_SHORT);
@@ -135,29 +131,7 @@ public class collectActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    //Adiciona os dispositivos encontrados no array list dos devices
-                    switch (beaconsQtdDetected){
-                        case 0:
-                            discoveredDevices.add(new Beacon(rssi,device.getAddress(), new Position(
-                                    Buffer.getHouseBuffer().getLastRoom().getWidth(),
-                                    Buffer.getHouseBuffer().getLastRoom().getHeight()/2
-                            )));
-                            break;
-                        case 1:
-                            discoveredDevices.add(new Beacon(rssi,device.getAddress(), new Position(
-                                    Buffer.getHouseBuffer().getLastRoom().getWidth()/2,
-                                    0
-                            )));
-                            break;
-                        case 2:
-                            discoveredDevices.add(new Beacon(rssi,device.getAddress(), new Position(
-                                    0,
-                                    Buffer.getHouseBuffer().getLastRoom().getHeight()/2
-                            )));
-                            break;
-                        default:
-                            Log.d(TAG, "Deu algo de ruim no switch case");
-                    }
+                    discoveredDevices.add(new Beacon(device.getAddress(),rssi));
                 }
             });
 
